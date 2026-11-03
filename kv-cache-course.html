@@ -1,0 +1,364 @@
+<!doctype html>
+<html lang="zh-CN"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="color-scheme" content="light dark"><title>从一个词元到一座推理集群 · KV Cache 互动课</title>
+<style>
+:root{--bg:#f6f5f0;--paper:#fffefa;--ink:#202e34;--muted:#56676b;--line:#d8dfd9;--brand:#006b61;--soft:#e8f3ee;--warm:#fff0d6;--code:#edf0ed;--shadow:0 12px 36px #183b3010}*{box-sizing:border-box}html{scroll-behavior:smooth;scroll-padding-top:24px}body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.9 -apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Microsoft YaHei",sans-serif;overflow-wrap:anywhere}a{color:var(--brand);text-underline-offset:4px}button,input,select{font:inherit}button,summary{cursor:pointer}button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible,summary:focus-visible{outline:3px solid #e59630;outline-offset:4px}.layout{max-width:1440px;margin:auto;display:grid;grid-template-columns:265px minmax(0,1fr);gap:45px;padding:32px}aside{position:sticky;top:24px;align-self:start;max-height:calc(100vh - 48px);overflow:auto;font-size:13px}aside a{display:block;padding:6px 9px;text-decoration:none;border-left:2px solid transparent}aside a.active{border-color:var(--brand);background:var(--soft);font-weight:700}aside strong{display:block;margin:10px 8px;color:var(--brand)}main{min-width:0;max-width:1010px}header{padding:34px 0 44px;border-bottom:1px solid var(--line)}.eyebrow{font-size:12px;letter-spacing:2px;font-weight:800;color:var(--brand)}h1{font-size:clamp(32px,5vw,59px);line-height:1.2;letter-spacing:-2px;margin:20px 0}h2{font-size:29px;line-height:1.4;margin:0 0 20px}h3{font-size:19px;margin:28px 0 10px}h4{font-size:16px;margin:18px 0 5px}p{margin:10px 0 16px}.lead{font-size:19px;color:var(--muted);max-width:780px}.pills{display:flex;flex-wrap:wrap;gap:9px}.pill{font-size:12px;border:1px solid var(--line);border-radius:22px;padding:3px 12px}.chapter{margin:50px 0;padding-bottom:38px;border-bottom:1px solid var(--line)}.num{font-size:13px;color:var(--brand);letter-spacing:2px;font-weight:800;margin-bottom:12px}.note,.calc,.interview{padding:18px 22px;background:var(--soft);border-radius:12px;margin:18px 0}.note{background:var(--warm)}.calc{background:var(--code);font-family:ui-monospace,"PingFang SC",monospace;line-height:1.85}.interview{background:var(--paper);border-left:3px solid var(--brand);box-shadow:var(--shadow)}.interview:before{content:'面试怎么答 · 约 1–2 分钟';display:block;font-size:12px;color:var(--brand);font-weight:800;letter-spacing:1px;margin-bottom:8px}code{font-family:ui-monospace,monospace;font-size:.9em;background:var(--code);padding:2px 5px;border-radius:4px}details{background:var(--paper);border:1px solid var(--line);border-radius:9px;margin:12px 0;padding:12px 16px}summary{font-weight:650}details>div{padding:12px 0 0}ul,ol{padding-left:24px}li{margin:6px 0}.table-wrap{width:100%;overflow-x:auto}table{border-collapse:collapse;width:100%;font-size:14px;table-layout:fixed}th,td{text-align:left;vertical-align:top;border-bottom:1px solid var(--line);padding:12px 10px;overflow-wrap:anywhere}th{color:var(--brand);background:var(--soft)}.widget{background:var(--paper);border:1px solid var(--line);border-radius:16px;padding:24px;margin:24px 0;box-shadow:var(--shadow)}.fields{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px}label{display:block;font-size:13px;color:var(--muted)}input,select{display:block;width:100%;min-width:0;background:var(--bg);color:var(--ink);border:1px solid var(--line);border-radius:6px;padding:9px 10px;margin-top:5px}button{background:var(--brand);color:white;border:0;border-radius:7px;padding:9px 15px}button.secondary{color:var(--brand);background:var(--soft)}.results{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;margin:20px 0}.stat{background:var(--soft);padding:15px;border-radius:9px;font-size:13px}.stat b{display:block;font-size:23px;line-height:1.4}.error{color:#b63823;font-weight:600}.barrow{display:grid;grid-template-columns:75px minmax(0,1fr) 90px;gap:12px;align-items:center;margin:10px 0;font-variant-numeric:tabular-nums}.track{height:15px;background:var(--code);border-radius:20px;overflow:hidden}.fill{height:100%;background:var(--brand);transition:width .2s}.flow{display:flex;align-items:stretch;flex-wrap:wrap;gap:9px;margin:20px 0}.flow span{flex:1 1 120px;background:var(--soft);padding:12px;text-align:center;border-radius:7px}.small{font-size:13px;color:var(--muted)}.checklist label{font-size:15px;display:flex;gap:10px;align-items:flex-start;margin:10px 0;color:var(--ink)}.checklist input{width:19px;min-width:19px;margin:6px 0}footer{padding:30px 0;color:var(--muted);font-size:13px}.mobile-nav{display:none}.back{position:fixed;right:18px;bottom:18px;background:var(--brand);color:white;border-radius:30px;padding:8px 16px;text-decoration:none;font-size:13px}.subtle{color:var(--muted)}.split{display:grid;grid-template-columns:1fr 1fr;gap:18px}.badge{font-size:12px;color:var(--brand);font-weight:700}progress{width:100%;accent-color:var(--brand);height:7px}@media(max-width:1050px){.layout{grid-template-columns:210px minmax(0,1fr);gap:24px;padding:20px}.fields{grid-template-columns:repeat(2,minmax(0,1fr))}}@media(max-width:760px){.layout{display:block;padding:20px}aside{position:static;max-height:none}aside nav{display:none}aside.expanded nav{display:block}.mobile-nav{display:block;margin-bottom:12px}aside strong{display:none}h1{letter-spacing:-1px}.fields,.split{grid-template-columns:1fr}.results{grid-template-columns:1fr}.widget{padding:18px}.chapter{margin-top:38px}.calc,.note,.interview{padding:15px}th,td{padding:9px 6px;font-size:12px}.barrow{grid-template-columns:58px minmax(0,1fr) 76px;gap:7px}h2{font-size:25px}.back{right:10px;bottom:10px}header{padding-top:18px}}@media(prefers-color-scheme:dark){:root{--bg:#122024;--paper:#192a2d;--ink:#e3ece7;--muted:#adc1bb;--line:#35494b;--brand:#74d9bd;--soft:#203b37;--warm:#3e3422;--code:#223236;--shadow:none}button{color:#122024}.error{color:#ffac99}}@media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}.fill{transition:none}}@media print{aside,.back,button{display:none}.layout{display:block;padding:0}main{max-width:none}.chapter{break-before:page}details{break-inside:avoid}body{font-size:11pt;background:white;color:black}.widget{box-shadow:none}a{color:inherit}}
+</style></head><body id="top"><div class="layout"><aside id="sidebar"><button class="mobile-nav secondary" id="navToggle" aria-expanded="false" aria-controls="toc">展开 / 收起学习目录</button><strong>AI INFRA · 从零推导</strong><nav id="toc" aria-label="学习目录"></nav><p class="small">顺序学习 12 章<br>3 个实时计算器 · 折叠答案<br>所有计算均在本机完成</p><progress id="readProgress" max="100" value="0" aria-label="阅读进度"></progress></aside><main>
+<header><div class="eyebrow">INTERACTIVE FIELD GUIDE / 2026.11</div><h1>从一个词元，<br>到一座推理集群。</h1><p class="lead">键值缓存（KV Cache）与大语言模型（Large Language Model，LLM）推理系统设计：先懂每一个数字，再做每一个选择。</p><div class="pills"><span class="pill">中文零基础</span><span class="pill">12 章递进</span><span class="pill">可离线打开</span><span class="pill">玩具数字 → 真实形状 → 系统设计</span></div>
+<p>人工智能基础设施（AI Infrastructure，AI Infra）是让人工智能模型能训练、能运行、能稳定服务的计算与软件系统。大语言模型（Large Language Model，LLM）是根据已有文字预测后续文字的模型。推理（inference）指使用训练完成的模型产生结果；训练（training）指用样本调整模型中的数字。接下来从“文字怎样变成数字”开始。</p><div class="note"><b>阅读约定</b><br>每章依次包含定义、类比、例子、手算、误解、练习和口述回答。先自己算，再点“查看答案”。前六章只建立必要概念，第七章才汇总容量公式。示例切词和数值向量都用于教学，不代表真实分词结果或真实模型输出。</div></header>
+<section class="chapter" id="c1" data-title="01 文字怎样变成 X"><div class="num">CHAPTER 01 / 表示</div><h2>词元（Token）、词嵌入（embedding）与 X</h2>
+<h3>定义 → 先认识一行数字</h3><p><b>词元（Token）</b>是模型处理文字的基本片段，可以是一个字、一个词的一部分或标点。分词器（tokenizer）把文字切成这些片段，并给每个片段一个整数编号，叫词元编号（token ID）。例如，为了讲解，假设“苹果好吃”被切成“苹果 / 好 / 吃”；真实切分由分词器（tokenizer）决定。</p><p><b>向量（vector）</b>是一串有顺序的数字，例如 [1, 2, 3]；分量（component）是其中一个数字；维度（dimension）是数字个数。<b>词嵌入（embedding）</b>是按词元编号（token ID）查表得到的向量，例如编号 7 查出 [1, 2, 3, 4]。<b>隐藏向量（hidden vector / hidden state）</b>是模型内部用来表示一个词元（Token）的数字向量，最初来自词嵌入（embedding），随后会逐层更新。隐藏维度（hidden size）是这行数字的长度。</p><p><b>矩阵（matrix）</b>是按行列排好的数字表。本文约定：只有一个词元（Token）时，X = [x₁, …, x₄₀₉₆] 是它的<b>整个</b>隐藏向量（hidden vector）；xᵢ 只是一个分量（component）。多个词元（Token）时，X 是每行一个词元（Token）的矩阵（matrix），形状（shape，即各轴的大小）为“词元数 × 隐藏维度（hidden size）”。</p>
+<h3>直观类比</h3><p>把词元编号（token ID）当作读者证号，词嵌入（embedding）是查到的初始档案，隐藏向量（hidden vector）是读完上下文后不断更新的档案。一个分量（component）只是档案中的一个数字，不能把它当成整个词的意思。</p>
+<h3>具体例子 → 指代与一词多义</h3><p><b>上下文（context）</b>是解释当前位置时可以参考的周围文字；在本课的因果生成中，是当前位置及之前的可见内容。<b>代词指代（pronoun reference）</b>是“他、她、它”等词所指向的人或事物。例如“她吃了苹果”里的“她”需要联系前文确定是谁。</p><p>“小明拿起苹果，他把它吃了。”中，“他”指小明，“它”指苹果。初始词嵌入（embedding）只按编号查表；后面讲的上下文计算才帮助形成这种联系。“我吃了一个苹果”里的苹果是水果，“苹果发布了新电脑”里的苹果是公司。同一个词元编号（token ID）可以有相同初始词嵌入（embedding），但处理上下文后得到不同隐藏向量（hidden vector）。切词不同则连初始编号也可能不同。</p>
+<h3>一步步计算 → 先小后大</h3><div class="calc">玩具：2 个词元，每个 4 维。<br>X = [[1,2,3,4], [5,6,7,8]]，形状 2×4，总计 2×4=8 个元素。<br>投影（projection）是用固定数字表 W 对每行做乘加：<br>W = [[1,0],[0,1],[1,0],[0,1]]，形状 4×2。<br>第一行：[1+3, 2+4] = [4,6]。<br>第二行：[5+7, 6+8] = [12,14]。<br>因此 XW = [[4,6],[12,14]]。第一行完全没有用第二行的数据。<br><br>Llama 3 8B：隐藏维度 4096；3 个词元组成 3×4096 的 X。<br>元素数 = 3×4096 = 12,288。若 W 为 4096×4096，输出为 3×4096。<br>每个输出分量是 4096 组乘积的和；每行独立做同一套乘加。</div><p>点积（dot product）就是对应分量相乘再求和；矩阵乘法（matrix multiplication）就是把这件事用于每个输出位置。“投影（projection）时各词元（Token）互不干扰”只描述这一步，后面会有跨行的信息交互。</p>
+<h3>常见误解</h3><p>X 不是 xᵢ；4096 是一行的宽度，不是句子长度。隐藏向量（hidden vector）的每个分量（component）也没有预先固定成“水果”“人名”这样的可读标签。初始词嵌入（embedding）还没有自动完成代词消歧。</p>
+<h3>练习题</h3><p>4 个词元（Token），每个隐藏向量（hidden vector）长 6，X 是什么形状？把第二行改掉，投影（projection）后的第一行会变吗？</p><details><summary>查看答案 · 第 1 章</summary><div>X 的形状（shape）是 4×6，共 24 个元素。固定同一个 W 时第一行不变，因为第一行的乘加只读第一行。上下文交互发生在后续步骤。</div></details>
+<div class="interview">我会先把文字看成一串词元，而不是直接把整句话交给模型。每个词元先获得一个编号，再查表得到词嵌入，也就是一行数字。这行数字在模型内部不断更新，叫隐藏向量。以隐藏维度 4096 为例，单个词元的 X 包含 4096 个分量，xᵢ 只是其中一个；多个词元则按行堆成矩阵。接下来做投影，就是每行分别乘同一套权重，因此投影本身不会让不同行交流。比如两行四维向量乘一个四行两列的矩阵，只会得到两行二维结果。苹果在水果句子和公司句子中，可以从同一个初始词嵌入出发，但经过后续上下文计算后具有不同表示。先分清初始表示、上下文表示和矩阵形状，后面的缓存容量才不会算错。</div></section>
+<section class="chapter" id="c2" data-title="02 模型为什么一层层堆叠"><div class="num">CHAPTER 02 / 深度</div><h2>层（Layer）：向量宽度不变，理解逐步更新</h2>
+<h3>定义</h3><p><b>权重（weight）</b>是训练（training）学到、用来做乘加的数字，例如上一章 W 里的数。<b>层（Layer）</b>在这里指一个变换器块（Transformer block）：一段有自己权重（weight）的处理单元。模型把许多层（Layer）纵向堆叠，上一层的输出送入下一层。每层都有独立权重（weight）。例如 Llama 3 8B 有 32 层（Layer）。</p><p><b>残差连接（residual connection）</b>是把输入直接加到处理结果上，写成 Y = X + F(X)，其中 F 表示这一段处理。相加的两项形状（shape）必须相同。例如 [1,2] + [0.1,0.3] = [1.1,2.3]。所以每个块（Transformer block）的输入和输出保持隐藏维度（hidden size）；中间步骤可以改变宽度，再投影（projection）回来。</p>
+<h3>直观类比</h3><p>像多位编辑依次修同一张卡片：每个人有自己的修改规则，卡片仍保留相同栏数。残差连接（residual connection）让编辑“在原稿上加修改”，不必每次从零重写。</p>
+<h3>具体例子</h3><p>“小明拿起苹果，他把它吃了。”可以在逐层处理时逐渐加强“他→小明”“它→苹果”的联系。“苹果很好吃”与“苹果发布电脑”的区别会通过不同上下文反映到各层的隐藏向量（hidden vector）。这只是直观说明，并不保证某一特定层（Layer）专门负责代词或水果。</p>
+<h3>一步步计算</h3><div class="calc">玩具：X=[1,2,3,4]。第一层给出 F₁(X)=[0,1,0,1]。<br>Y₁=X+F₁(X)=[1,3,3,5]，仍为 4 维。<br>第二层给出 F₂(Y₁)=[1,0,1,0]。<br>Y₂=Y₁+F₂(Y₁)=[2,3,4,5]，仍为 4 维。<br><br>Llama 3 8B：输入 5×4096 → 第 1 层输出 5×4096 → … → 第 32 层输出 5×4096。<br>每个边界的元素数 = 5×4096=20,480；32 层不把向量变成 32×4096 维。<br>仅统计每层一次这样的相加：32×20,480=655,360 次标量加法。<br>真实块内通常有不止一次残差相加，这不是整模型运算量。</div>
+<h3>常见误解</h3><p>层数（number of layers）是深度，隐藏维度（hidden size）是宽度；不能互换。独立权重（independent weights）不等于每个词元（Token）都有一份新权重，同一层的所有词元（Token）共用这一层的权重。残差连接（residual connection）要求相加时对齐，但不要求中间每一步都保持宽度。</p>
+<h3>练习题</h3><p>一层输入为 3×4096，内部临时变成 3×1024。可以直接和原输入做残差相加吗？</p><details><summary>查看答案 · 第 2 章</summary><div>不可以。必须先把内部结果投影（projection）回 3×4096，才能逐分量相加。输出仍是 3×4096。</div></details>
+<div class="interview">层指的是纵向堆叠的处理块，不是向量中的一个数字。一个词元带着固定宽度的隐藏向量，依次经过不同层，每一层用自己训练得到的权重更新表示。以 Llama 3 8B 为例，32 层的边界都保持 4096 维，因此深度增加不会把单个词元变成十几万维。残差连接是输入加上本层算出的修正量，两边形状必须一致，所以内部即使改变宽度，也要投影回来再相加。直观上像多个编辑依次修改同一张卡片：每个人有不同规则，但卡片栏数不变。对代词指代和苹果的不同含义，上下文表示可以逐层演化；不过不能把每一层硬性命名为某种语言功能。这个区分会直接影响后面按层累加存储的计算。</div></section>
+<section class="chapter" id="c3" data-title="03 头与每头维度"><div class="num">CHAPTER 03 / 宽度分工</div><h2>注意力头（attention head）：几路查询，几份记忆</h2>
+<h3>定义</h3><p><b>注意力（attention）</b>是让当前位置根据相关程度，从已有位置收集信息的计算。<b>注意力头（attention head）</b>是一路独立的注意力计算，例如一条路线更关注“谁”，另一条更关注“哪个物品”；真实头的功能并不固定为这些语义。</p><p><b>Q 头（Query head）</b>提供当前查询；<b>KV 头（Key-Value head）</b>提供供查询匹配和读取的数据。这里先把两者理解成“提问路线”和“资料路线”，下一章定义具体数字。<b>每头维度（head_dim）</b>是每条路线中向量的长度。对本课使用的 Llama 形状，隐藏维度（hidden size）÷ Q 头数（number of Query heads）= 每头维度（head_dim）。</p><p><b>多头注意力（Multi-Head Attention，MHA）</b>是每个 Q 头（Query head）各用一份 KV 头（Key-Value head）；<b>分组查询注意力（Grouped-Query Attention，GQA）</b>是几个 Q 头（Query head）共用一份 KV 头（Key-Value head）；<b>多查询注意力（Multi-Query Attention，MQA）</b>是所有 Q 头（Query head）共用一份 KV 头（Key-Value head）。这些是架构选择，不是随意改一个数字就能无损切换的运行开关。</p>
+<h3>直观类比</h3><p>32 位提问者可以各拿一本资料，也可以每 4 人共用一本，或 32 人共用一本。提问者数量和资料份数不是一回事。</p>
+<h3>具体例子</h3><p>“小明拿苹果，他吃了它。”中，不同查询路线可以帮助关联“他”和“小明”、“它”和“苹果”。在“吃苹果”与“苹果发布电脑”中，资料来自不同上下文；共用资料路线不会让水果与公司自动混为一谈，因为匹配数字仍由上下文和学到的权重（weight）决定。</p>
+<h3>一步步计算</h3><div class="calc">玩具：隐藏维度 8，Q 头 4 → 每头维度=8÷4=2。<br>若 KV 头 2，则每 2 个 Q 头共用一份 KV；KV 总宽度=2×2=4。<br>Q 的总宽度=4×2=8，两者不必相等。<br><br>Llama 3 8B：4096÷32=128；Q 总宽度=32×128=4096。<br>实际 GQA：KV 头 8 → 每 4 个 Q 头共用一份 KV；KV 总宽度=8×128=1024。<br>同宽度对比假设：MHA 用 32 个 KV 头，KV 宽度=4096；MQA 用 1 个 KV 头，KV 宽度=128。</div>
+<h3>常见误解</h3><p>头（head）不是层（Layer）：前者是同层里的多条路线，后者是纵向深度。每头维度（head_dim）不是用隐藏维度（hidden size）除以 KV 头数（number of Key-Value heads）。隐藏维度÷Q 头数的关系适用于本课模型，不应当作所有未来架构的通用定律。</p>
+<h3>练习题</h3><p>隐藏维度（hidden size）8192，Q 头（Query head）64 个，KV 头（Key-Value head）8 个：每头维度和共享组大小分别是多少？</p><details><summary>查看答案 · 第 3 章</summary><div>每头维度（head_dim）=8192÷64=128；每个 KV 头（Key-Value head）服务 64÷8=8 个 Q 头（Query head）；KV 总宽度=8×128=1024。这也是 Llama 3 70B 使用的头部形状。</div></details>
+<div class="interview">注意力头是同一层中的多路注意力计算。我会把查询路线和保存资料的路线分开计数：前者是 Q 头，后者是 KV 头。对 Llama 3 8B，隐藏维度是 4096，32 个 Q 头使每头维度等于 128；但它只有 8 个 KV 头，因此每 4 个查询头共用一份键值资料，KV 总宽度是 1024。MHA 是一对一，GQA 是分组共享，MQA 是全部共享。这个设计减少资料份数，但不是简单减少查询头数，也不是把模型层数减少了。头内部的投影仍然读整个输入隐藏向量，并非天然只看输入向量的一小段。后面计算缓存时应使用 8 个 KV 头，而不是 32 个 Q 头，否则就会把这类模型的缓存高估四倍。</div></section>
+<section class="chapter" id="c4" data-title="04 Q、K、V 如何算出来"><div class="num">CHAPTER 04 / 注意力的数据流</div><h2>查询（Query）、键（Key）和值（Value）</h2>
+<h3>定义</h3><p><b>查询（Query，Q）</b>是当前位置用来寻找信息的向量；<b>键（Key，K）</b>是被搜索位置用于匹配的向量；<b>值（Value，V）</b>是被匹配后实际取出的内容向量。例如，“它”位置的 Q 寻找“苹果”位置的 K，最后读取它的 V。这些只是功能类比，向量不是可直接读的中文问题或标签。</p><p><b>查询投影权重（Query projection weights，Wq）</b>、<b>键投影权重（Key projection weights，Wk）</b>和<b>值投影权重（Value projection weights，Wv）</b>是三组学到的矩阵（matrix）。公式为 Q=XWq、K=XWk、V=XWv。每层（Layer）各有一套；训练（training）后在常规推理（inference）中冻结（frozen，即不再更新权重）。输入 X 每次仍会变。</p><p><b>旋转位置编码（Rotary Position Embedding，RoPE）</b>是按词元位置旋转向量中成对分量的方法，让查询与键的匹配携带相对位置信息。例如相隔一格与相隔十格会得到不同旋转关系。Llama 中 Q、K 做 RoPE，V 不做。<b>输出投影（output projection，Wo）</b>是把各头结果拼接后映射回隐藏维度（hidden size）的权重矩阵。</p>
+<p><b>加权和（weighted sum）</b>是给各项分别乘一个系数再相加。例如两件物品的内容向量分别为 [2,0]、[0,4]，权重为 0.25、0.75，则结果为 [0.5,3]。这里的权重（attention weights）是本次匹配生成的系数，区别于训练保存的模型权重（model weights）。</p><h3>直观类比</h3><p>Q 像检索问题，K 像目录标签，V 像书页内容。先按标签找相关书页，再按相关程度混合内容；Wo 像把各位检索员的结果汇编成一份同宽报告。</p>
+<h3>具体例子</h3><p>在“王芳把苹果给李雷，她说它很甜”中，“她”的 Q 可能更匹配“王芳”的 K，“它”的 Q 可能更匹配“苹果”的 K。“苹果发布了电脑，它很轻”中的“它”也可能指电脑；模型必须依赖句子，不能写死词元对。“苹果”的水果与公司含义，会影响各层 X，因而改变 Q、K、V。</p>
+<h3>一步步计算</h3><div class="calc">玩具单头：X=[1,2]；Wq=[[1,0],[0,1]]；Wk=[[1,1],[0,1]]；Wv=[[2,0],[0,3]]。<br>Q=[1,2]；K=[1,3]；V=[2,6]。<br>假设已有两个位置 K₁=[1,0]、K₂=[0,1]，对应 V₁=[2,0]、V₂=[0,4]。<br>当前 Q=[1,2]，点积分别为 1、2；再除以 √2，得到 0.707、1.414。<br>平方根（square root）√2 是平方后等于 2 的正数，约 1.414；除以它用于缩放打分。<br>如何把分数变权重将在下一章计算；若所得权重是 0.33、0.67，输出就是<br>0.33×[2,0]+0.67×[0,4]=[0.66,2.68]。<br>RoPE 的小例子：把 [1,0] 旋转 90° 得 [0,1]；真实角度依位置和频率确定。<br><br>Llama 3 8B 每层：X 为 T×4096（T 是词元数）。<br>Wq：4096×4096 → Q 为 T×4096 → 32 路各 T×128。<br>Wk、Wv：各 4096×1024 → K、V 各 T×1024 → 8 路各 T×128。<br>每个 Q 头最终产生 128 维结果，32×128=4096 维，拼接后乘 4096×4096 的 Wo。<br>32 层各自拥有这些矩阵；不是全模型共用一套。</div><p><b>因果遮罩（causal mask）</b>是禁止当前位置看到未来位置的规则，例如第 3 个词元（Token）只能读第 1、2、3 个位置。它保证预测后续文字时不提前偷看答案。后面缓存不变性的推导就依赖这条规则。</p>
+<h3>常见误解</h3><p>Wq/Wk/Wv 是权重（weight），Q/K/V 是随输入生成的数据，两者不同。每个头的投影（projection）可读取整行 X，不是简单裁出 128 个原始分量。多个头通过各自 Q、K、V 做跨位置匹配；只有投影步骤逐行独立。Wo 也会混合多头结果。</p>
+<h3>练习题</h3><p>两个头各输出 [1,2] 和 [3,4]，拼接后是什么？若 Wo 为 4×6，最终宽度是多少？为什么 V 不需要照搬 Q 的位置旋转？</p><details><summary>查看答案 · 第 4 章</summary><div>拼接是 [1,2,3,4]，形状为 1×4，乘 4×6 后成为 1×6。Llama 的 RoPE 把位置关系放进 Q 与 K 的匹配中，V 保留用来加权汇总的内容表示；这是该架构的设计，不是所有位置编码方案的共同要求。</div></details>
+<div class="interview">Q、K、V 都由当前层的隐藏向量分别乘三套投影权重得到。权重训练后冻结，但每次输入产生的 Q、K、V 不同。直观上，Q 是当前问题，K 是用来找信息的标签，V 是真正读取的内容。计算时，当前 Q 与可见位置的 K 做点积并缩放，再把分数转成权重，用这些权重对 V 求加权和。Llama 会在匹配前给 Q、K 加 RoPE 来体现位置，V 不做同样旋转。多个头的输出先拼起来，再经过 Wo 回到隐藏宽度，才能进入残差连接。对 8B 的 GQA，Q 投影输出 4096 维，K 和 V 各只有 1024 维。最后，因果遮罩限制只能读当前及以前位置；这个限制是旧数据可以缓存复用的关键前提。</div></section>
+<section class="chapter" id="c5" data-title="05 打分怎样变成概率"><div class="num">CHAPTER 05 / 归一化与训练背景</div><h2>未归一化打分（logits）、软最大函数（softmax）与 z 损失（z-loss）</h2>
+<h3>定义</h3><p><b>概率（probability）</b>是表示事件发生可能性的 0 到 1 之间的数，例如 0.75 等于 75%。<b>概率分布（probability distribution）</b>把所有候选的概率列出来，总和为 1；例如两种结果的 [0.25,0.75]。<b>归一化（normalization）</b>是在这里把非负数按总和缩放到和为 1，例如 [1,3] 都除以 4 得 [0.25,0.75]。</p><p><b>未归一化打分（logits）</b>是还没变成概率的一组实数，例如 [1,2]，可以为负也不要求加起来等于 1。<b>软最大函数（softmax）</b>把每个打分做指数运算后，除以所有指数的和，得到总和为 1 的概率。指数函数（exponential function，exp）把数字 z 变成 e 的 z 次方，e≈2.718；例如 exp(0)=1、exp(1)≈2.718。</p><p><b>词表（vocabulary）</b>是所有可输出词元（Token）的编号集合。最终隐藏向量（hidden vector）经过词表输出投影（vocabulary output projection）得到每个候选词元的打分。它和注意力（attention）里对历史位置打分是不同位置的计算，但都能用软最大函数（softmax）归一化。</p><p><b>损失（loss）</b>是训练（training）用来衡量预测差错的数。<b>交叉熵损失（cross-entropy loss）</b>在正确答案为 y 时等于 −ln(pᵧ)。自然对数（natural logarithm，ln）是 exp 的逆运算，如 ln(e)=1。正确答案概率越高，损失越小。推理（inference）时通常按概率采样（sampling，即随机抽取）或取最高分，产生下一个词元（Token）。</p><p><b>对数指数和（logsumexp，LSE）</b>是 ln(Σ exp(zᵢ))；<b>z 损失（z-loss）</b>是给训练目标增加 α×LSE² 的小惩罚项，α 是一个很小的系数（coefficient）。它约束共同的打分偏移，减轻数值漂移；不是所有语言模型都使用。此处讨论语言模型输出打分上的版本；后面专家路由也可能用相关损失，不能混为一谈。<a href="#src-z">[来源 2]</a></p>
+<h3>直观类比</h3><p>打分像选手原始成绩，softmax 像把成绩转成一袋抽签券的份额。所有人成绩同时加 100，券的份额不变；z-loss 则提醒“成绩整体别漂得太远”。</p>
+<h3>具体例子</h3><p>在“她把苹果拿起来，它……”中，输出词表可以对“很甜”“开机”等后续片段打分。“我吃苹果”与“苹果发布电脑”会有不同打分。对于“她”和“它”寻找先行词，注意力位置打分也能经过 softmax 形成读取权重，但它不是最终输出词表概率。</p>
+<h3>一步步计算</h3><div class="calc">玩具 logits=[0,ln 3]≈[0,1.098612]。<br>① exp 后：[1,3]；② 总和=4；③ 概率=[1/4,3/4]=[0.25,0.75]。<br>④ 正确答案是第二项：交叉熵=−ln(0.75)=0.287682。<br>⑤ LSE=ln 4=1.386294；若 α=0.001，z-loss=0.001×1.386294²=0.001922。<br>总训练损失=0.287682+0.001922=0.289604。<br>若两项都加 10：概率不变，LSE 变为 11.386294，z-loss≈0.129648。<br><br>稳定算法：m=max(z)，pᵢ=exp(zᵢ−m)/Σexp(zⱼ−m)。<br>LSE=m+ln(Σexp(zⱼ−m))；注意计算 z-loss 时必须把 m 加回来。<br><br>Llama 3 8B：最终宽度 4096，词表大小 128,256。<br>单个位置输出 128,256 个 logits；3 个位置共 3×128,256=384,768 个。<br>真实概率取决于模型输出，不能凭配置编造；若只是把所有分数设为 0，<br>每项概率=1/128,256≈0.000007797，全相同仅是教学基线。</div>
+<div class="widget" id="softmaxWidget"><span class="badge">计算器 1 / SOFTMAX</span><h3>改打分，看概率如何变化</h3><label for="logits">输入未归一化打分（logits），用逗号或空格分隔</label><input id="logits" value="0, 1.0986122886681098" autocomplete="off"><div class="pills" style="margin-top:12px"><button id="shiftLogits" class="secondary">全部 +10</button><button id="resetLogits" class="secondary">恢复示例</button></div><div id="softError" class="error" role="status"></div><div id="softBars" aria-live="polite"></div><p id="softWork" class="calc"></p><p class="small">概率是对当前输入列表归一化。这里没有运行语言模型；数值来自你输入的打分。</p></div>
+<h3>常见误解</h3><p>softmax 不等于“最大值变成 1”；最高概率也不保证正确。数值稳定（numerical stability）的“减最大值”是计算技巧，z-loss 是训练正则项（regularization，即额外约束），两者不同。z-loss 不会把每个打分都直接压成 0，也不是缓存的功能。</p>
+<h3>练习题</h3><p>打分 [1,2,3] 全部加 100，概率会变吗？LSE 和 z-loss 会变吗？</p><details><summary>查看答案 · 第 5 章</summary><div>概率不变，约为 [0.090031,0.244728,0.665241]。LSE 从约 3.407606 增加到 103.407606，平方后的惩罚通常会显著变化。概率只看相对差，而 z-loss 也约束共同偏移。</div></details>
+<div class="interview">Logits 是未归一化打分，softmax 先对它们取指数，再除以总和，得到概率分布。比如零和 ln 3 的指数是一和三，因此概率是四分之一和四分之三。训练时，正确答案的概率可以进入交叉熵；推理时，我们按概率采样或选择最高分，生成下一个词元。注意力也用类似归一化，但那里的概率分配给历史位置，不是分配给输出词表。共同平移 logits 不改变 softmax，却可能造成数值问题，所以某些训练方案加上小系数乘 logsumexp 平方的 z-loss，约束整体漂移。实现上还应先减最大值再算指数，避免溢出。z-loss 是训练选择，稳定 softmax 是计算技巧，两者不能互相替代，也不能说每个模型都必然使用 z-loss。</div></section>
+<section class="chapter" id="c6" data-title="06 为什么只缓存 K 和 V"><div class="num">CHAPTER 06 / 时间上的复用</div><h2>键值缓存（KV Cache）：算过的旧资料，接着用</h2>
+<h3>定义</h3><p><b>键值缓存（Key-Value Cache，KV Cache）</b>是为每层（Layer）保存历史词元（Token）的 K、V，供后续生成复用的存储。<b>自回归生成（autoregressive generation）</b>指一次生成后续的一个词元（Token），把它接到已有内容之后，再继续预测。由于因果遮罩（causal mask），旧位置永远看不到新追加的未来位置；在权重、位置规则和已有前缀固定时，旧 K、V 不变。</p><p><b>提示词（prompt）</b>是请求提供的已有文字。<b>预填充（Prefill）</b>是把提示词（prompt）的全部位置在每层中并行处理，建立缓存并获得首个输出的预测。层（Layer）之间仍然顺序执行。<b>逐步解码（Decode）</b>是之后每步只对新输入位置计算 Q、K、V，把新 K、V 追加到缓存，Q 与全部可见 K 匹配并读取 V。</p><p><b>请求（request）</b>是一次服务调用，例如提交一段提示词（prompt）并要求生成文字。请求结束后释放独占缓存；若开启共享复用机制，公共部分可保留，具体留到第九章。旧 Q 不会参与下一位置的查询，所以普通推理缓存只存 K、V，不存历史 Q。</p>
+<h3>直观类比</h3><p>读小说时把每页的“索引与摘要”存入笔记，下一页用新问题查旧笔记。上一次问过的问题本身，不是下一次检索需要保存的资料。</p>
+<h3>具体例子</h3><p>给定“小明拿苹果，他把它”，接下来可能输出“吃”。读“它”时查询前面的苹果；下一步用“吃”的新 Q 读取历史，旧“它”的 Q 不再使用。“苹果好吃”与“苹果发布电脑”的缓存不同，不能只因为出现同一个词就互换。</p>
+<h3>一步步计算</h3><div class="calc">玩具：提示词 3 个位置，生成第 1 个输出后还继续生成 2 个。<br>无缓存：处理 3+4+5=12 个位置的投影。<br>有缓存：先处理 3 个，再处理新增的 1 个、1 个，共 3+1+1=5 个位置。<br>旧 K、V 被复用，但每步注意力仍要读旧 K、V，不是零成本。<br><br>Llama 3 8B：4096 个提示位置，另执行 2 次 Decode。<br>无缓存投影位置数：4096+4097+4098=12,291；有缓存：4096+1+1=4098。<br>单层每个位置 K、V 共 2×8×128=2048 个元素。<br>初始单层缓存=4096×2048=8,388,608 个元素；追加两次后=4098×2048=8,392,704 个。</div>
+<div class="flow" aria-label="请求生命周期"><span>提示词（prompt）<br>多个位置并行</span><span>预填充（Prefill）<br>填每层 K、V</span><span>逐步解码（Decode）<br>新 Q 查询，追加 KV</span><span>结束（finish）<br>释放独占缓存</span></div>
+<h3>常见误解</h3><p>缓存（cache）消除的是历史投影等重复计算，并没有消除读取历史的注意力计算。Prefill 不是让未来词元泄漏到过去：并行计算仍遵循遮罩。更改早期提示词、模型权重或位置规则，旧缓存就可能失效。最后一个刚采样出的词元通常要到下一次前向计算（forward pass，即运行模型一步）才会写入自己的 KV；预算按完整保留长度计算更安全。</p>
+<h3>练习题</h3><p>提示词（prompt）长 5，之后执行 3 次 Decode。缓存让投影处理的位置数从多少变成多少？是否也能省去对历史 K、V 的读取？</p><details><summary>查看答案 · 第 6 章</summary><div>无缓存为 5+6+7+8=26 个位置，有缓存为 5+1+1+1=8 个位置。不能省去所有历史读取，新查询仍要通过历史键匹配并汇总历史值。此题计数指投影位置数，不是总计算量或延迟倍数。</div></details>
+<div class="interview">KV Cache 的前提是因果自回归生成：新词元追加到后面，不会改变旧位置已经看到的前缀，所以旧位置每层的 K、V 可以复用。服务先做 Prefill，在每一层并行处理提示词中的位置并建立缓存，最后位置可直接用于预测第一个输出。进入 Decode 后，每一步只对新输入位置计算 Q、K、V，新 K、V 追加到缓存，新 Q 查询全部可见历史。旧 Q 只服务旧位置的输出，不会被未来查询使用，因此通常不缓存。比如五个提示位置加三次解码，投影位置数可以从二十六降到八，但历史 K、V 仍然需要读取，所以长上下文并不是免费。请求结束释放独占缓存，能否保留公共前缀则由服务端复用策略决定。</div></section>
+<section class="chapter" id="c7" data-title="07 一步步计算 KV 容量"><div class="num">CHAPTER 07 / 从元素数到字节数</div><h2>键值缓存（KV Cache）容量：六个乘数和一个 2</h2>
+<h3>定义</h3><p><b>字节（byte，B）</b>是存储容量单位，1 字节等于 8 个比特（bit，即一个 0 或 1）。<b>每元素字节数（bytes per element）</b>是存一个数需要多少字节。<b>脑浮点 16（Brain Floating Point 16，bf16）</b>是每个数用 16 比特存储的数字格式，所以一个元素用 16÷8=2 字节。例如 10 个 bf16 数用 20 字节。<b>序列长度（sequence length，T）</b>是当前保留的词元（Token）个数；包含已经处理的提示词和输出。<b>批次（batch，B）</b>是一起执行的请求集合，批量大小（batch size）是其中请求数；同长度时，总缓存等于单请求缓存乘批量大小。</p><p><b>图形处理器（Graphics Processing Unit，GPU）</b>是擅长并行乘加的处理器；<b>显存（GPU memory）</b>是它存放权重和运行数据的存储。<b>缓存池（KV pool）</b>是显存中留给键值缓存（KV Cache）的部分。例如 80 GB 总显存里扣掉权重和运行余量，剩余部分才可放缓存。<b>并发（concurrency）</b>是同时保留并处理多少请求，不等于每秒完成多少请求。</p>
+<h3>直观类比</h3><p>算仓库箱数：每个词元（Token），每层（Layer），每个 KV 头（Key-Value head）都放两箱，K 一箱、V 一箱；每箱有每头维度（head_dim）那么多数。先数东西，再按每件多大换算容量。</p>
+<h3>具体例子</h3><p>“她买了苹果，它很甜”与“苹果发新电脑，它很轻”产生不同数据，但若长度、层数、KV 头数和格式相同，缓存容量相同。语义影响内容，不直接改变相同形状（shape）的元素数。</p>
+<div class="note"><b>本课统一口径：字节永远是精确值</b><br>十进制：1 KB=1000 B，1 MB=10⁶ B，1 GB=10⁹ B，1 TB=10¹² B。二进制：1 KiB=1024 B，1 MiB=1024² B，1 GiB=1024³ B。课堂常说的“128 KB、512 MB、2 GB”实际常指 128 KiB、512 MiB、2 GiB。本课会保留这些熟悉说法并紧邻标出严格单位；计算器同时显示两种单位。8k/32k/128k 分别取 8192/32768/131072 个词元（Token）。</div>
+<h3>一步步计算 → 先算元素，再乘字节</h3><div class="calc">单层单词元元素数 = 2 × KV 头数 × 每头维度。<br>单词元跨全部层元素数 = 2 × N层 × Hkv × d。<br>单请求元素数 = 2 × N层 × Hkv × d × T。<br>整批元素数 = 2 × N层 × Hkv × d × T × B。<br>整批字节数 = 2 × N层 × Hkv × d × T × B × s。<br>这里 s 是每元素字节数；前面的 2 是 K、V 两份，与 bf16 的 2 字节无关。<br>本课用 N层 表示层数、T 表示序列长度；别人写 L 时必须先问 L 代表什么。</div>
+<h4>玩具模型：2 层、1 个 KV 头、每头 2 维、bf16、5 个词元、1 个请求</h4><div class="calc">① 单层单词元：2×1×2=4 个元素 → 4×2=8 B。<br>② 单词元全部层：4×2=8 个元素 → 8×2=16 B。<br>③ 单请求：8×5=40 个元素 → 40×2=80 B。<br>④ 若 batch=3：40×3=120 个元素 → 120×2=240 B。</div>
+<h4>Llama 3 8B：32 层、8 个 KV 头、每头 128 维、bf16</h4><div class="calc">① 每词元每层：2×8×128=2048 个元素。<br>2048×2=4096 B=4 KiB（课堂写“4 KB”）。<br>② 每词元全模型：2048×32=65,536 个元素。<br>65,536×2=131,072 B=128 KiB（课堂写“128 KB/token”）。<br>③ 4096 长度单请求：65,536×4096=268,435,456 个元素。<br>×2=536,870,912 B=512 MiB=0.5 GiB≈0.5369 GB。<br>即课堂常说“4096 序列一个请求 512 MB”。</div>
+<div class="table-wrap"><table><thead><tr><th>同一隐藏形状的对比</th><th>每词元全层</th><th>4096 长度单请求</th></tr></thead><tbody><tr><td>实际 GQA：8 个 KV 头</td><td>2×32×8×128×2 = 131,072 B = 128 KiB</td><td>512 MiB（课堂 512 MB）</td></tr><tr><td>假设 MHA：32 个 KV 头</td><td>2×32×32×128×2 = 524,288 B = 512 KiB</td><td>2 GiB（课堂 2 GB）</td></tr><tr><td>假设 MQA：1 个 KV 头</td><td>2×32×1×128×2 = 16,384 B = 16 KiB</td><td>64 MiB（课堂 64 MB）</td></tr></tbody></table></div><p>MHA/MQA 两行只替换 KV 头数来比较存储，<b>不是 Llama 3 8B 官方提供的另外两个配置</b>。Llama 3 70B 实际为 80 层（Layer）、64 个 Q 头（Query head）、8 个 KV 头（Key-Value head）、每头 128 维：2×80×8×128=163,840 个元素/词元，再乘 2 B 得 327,680 B=320 KiB/词元；4096 长度为 1.25 GiB。<a href="#src-llama">[来源 1]</a></p>
+<div class="widget" id="kvWidget"><span class="badge">计算器 2 / KV 容量与并发</span><h3>从一个词元，算到一个副本</h3><label for="kvPreset">选择预设（preset）</label><select id="kvPreset"><option value="toy">玩具模型 · 2 层 / 1 KV 头 / 2 维 / 5 词元</option><option value="gqa" selected>Llama 3 8B · 实际 GQA</option><option value="mha">Llama 3 8B 同形状对比 · 假设 MHA</option><option value="mqa">Llama 3 8B 同形状对比 · 假设 MQA</option><option value="70b">Llama 3 70B · 实际 GQA</option><option value="500bf">500B 本练习假设 · bf16 权重 / 8k</option><option value="500fp">500B 本练习假设 · fp8 权重 / bf16 KV / 8k</option></select><p id="presetNote" class="small"></p><div class="fields">
+<label>层数（number of layers）<input id="kvLayers" type="number" min="1" step="1" value="32"></label><label>KV 头数（KV heads）<input id="kvHeads" type="number" min="1" step="1" value="8"></label><label>每头维度（head_dim）<input id="kvDim" type="number" min="1" step="1" value="128"></label><label>每元素字节数（bytes per element）<input id="kvBytes" type="number" min="0.01" step="0.5" value="2"></label><label>序列长度（sequence length）<input id="kvSeq" type="number" min="1" step="1" value="4096"></label><label>批量大小（batch size）<input id="kvBatch" type="number" min="1" step="1" value="1"></label><label>GPU 总显存 · 十进制 GB<input id="kvGpu" type="number" min="0" step="1" value="80"></label><label>显存可用比例（memory utilization）<input id="kvUtil" type="number" min="0" max="1" step="0.01" value="0.9"></label><label>权重大小（weight size）· GB<input id="kvWeight" type="number" min="0" step="1" value="16"></label><label>额外运行预留（runtime reserve）· GB<input id="kvReserve" type="number" min="0" step="0.1" value="0"></label></div><p class="small">权重与 GPU 输入按十进制 GB。运行预留默认 0 用于复现简化题；部署时必须测量填入。上下文长度需包含预留输出。500B 形状全部是本练习假设；更改任意字段后按当前值计算。</p><div id="kvError" class="error" role="status"></div><div id="kvResults" class="results" aria-live="polite"></div><div id="kvWork" class="calc"></div><button id="sendDecode" type="button">把权重和整批 KV 带到 Decode 计算器</button></div>
+<h3>常见误解</h3><ul><li>不能用隐藏维度（hidden size）4096 代替 KV 总维度（KV width）1024；也不能把 32 个 Q 头（Query head）填入实际 GQA 的 KV 头数。</li><li>公式里有一个“存 K 和 V”的 2，还有一个“bf16 每数两字节”的 2，缺一项就少一半。</li><li>符号 L 有人用作长度、有人用作层数。先写定义再代入，不凭字母猜。</li><li>不同请求长度不同，整批容量应按 ΣTᵢ 求和；公式 T×B 适用于等长或统一按上限估算的场景。</li><li>总量能装下不保证每张卡都能装下。KV 分片（sharding，即分到不同设备）与复制（replication，即多处保留同一份）会影响真实占用，后面讲并行时继续分析。</li></ul>
+<h3>练习题</h3><p>玩具模型 batch 从 1 变 4、序列长度从 5 变 10，总容量是多少？Llama 3 8B 的实际 GQA 若改为每元素 1 字节，4096 长度容量是多少？</p><details><summary>查看答案 · 第 7 章</summary><div>玩具：2×2×1×2×10×4=320 个元素，×2 B=640 B。8B：元素数仍为 268,435,456，×1 B=256 MiB；只有确认支持对应的低精度缓存（low-precision KV cache）并验证质量，才可实际这样部署。量化权重（quantized weights，即用更少比特存权重）不会自动让 KV 也减半。</div></details>
+<div class="interview">我会先数元素，再换算字节，避免把头数和隐藏维度混在一起。每个词元在每层有 K 和 V 两份，每份包含 KV 头数乘每头维度个元素，再乘层数、保留长度和批量大小，最后乘每元素字节数。以 Llama 3 8B 的 GQA 为例，单层单词元是二乘八乘一百二十八，得到 2048 个元素；bf16 乘两字节是 4 KiB。32 层得到 128 KiB 每词元，4096 长度就是 512 MiB。若同形状改成 32 个 KV 头，容量变四倍；若只有一个 KV 头，就变成八分之一。我还会明确 KB 与 KiB 的单位，先扣权重和运行余量，再估缓存池；最终并发要同时满足每卡显存和服务延迟，不能只看全副本总容量。</div></section>
+<section class="chapter" id="c8" data-title="08 延迟与 Decode 下限"><div class="num">CHAPTER 08 / 算得动与搬得快</div><h2>预填充（Prefill）、逐步解码（Decode）与延迟</h2>
+<h3>定义</h3><p><b>首词元延迟（Time To First Token，TTFT）</b>是从请求发出到收到首个输出词元的时间，例如 300 毫秒。<b>每输出词元延迟（Time Per Output Token，TPOT）</b>是首个输出之后，相邻输出的平均间隔，常按（最后输出时间−首个输出时间）÷（输出数−1）计算；少于两个输出时不能这样定义。<b>吞吐（throughput）</b>是单位时间完成的工作，例如每秒生成多少词元。<b>带宽（bandwidth）</b>是每秒能搬运多少字节；<b>聚合带宽（aggregate bandwidth）</b>是参与设备带宽之和，但只有数据均匀分片且同时工作时才可能接近。</p><p><b>算力密集（compute-bound）</b>表示主要受乘加速度限制；<b>访存密集（memory-bound）</b>表示主要受搬运数据速度限制。Prefill 通常能让同一份权重服务很多位置的矩阵乘法（matrix multiplication），更接近算力密集；小批量 Decode 每步只产生每个请求一个新位置，常更接近访存密集。大批量或超长上下文会改变瓶颈，不能把这两句话当绝对定律。</p><p><b>高带宽内存（High Bandwidth Memory，HBM）</b>是 GPU 上容量有限但带宽很高的显存；<b>浮点运算（Floating Point Operation，FLOP）</b>是一次浮点算术操作；TFLOPS 表示每秒万亿次这样的操作。<b>八位浮点（8-bit floating point，fp8）</b>是一个数用 8 比特、即 1 字节的格式。<b>稠密计算（dense computation）</b>按完整数据计算，不假定大量零值可跳过；稀疏（sparse）指标可能利用零值而给出更高峰值，不能与稠密峰值混用。</p>
+<h3>直观类比</h3><p>Prefill 像整班学生一起读教材，一次拿到书可以反复用；Decode 像每次只回答一道题，却要不断翻书。TTFT 是等第一道答案多久，TPOT 是后续答案之间等多久。</p>
+<h3>具体例子</h3><p>“小明拿苹果，他说它很甜”作为提示词时，Prefill 一次处理已有位置；随后逐步输出新词。“苹果发布电脑”即使词元数量相同，概率不同，但读取同形状缓存的理想容量下限一样。代词的语义难度不能替代实际延迟测量。</p>
+<h3>一步步计算</h3><div class="calc">理想 Decode 读取下限：t秒 ≥（每步权重读取字节 + 整批 KV 读取字节）÷聚合有效带宽。<br>假设普通稠密全注意力、权重每步读一遍、每请求每步输出 1 个词元。<br>单流速度上界=1/t；整批吞吐上界=batch/t。<br><br>玩具：权重 6 GB，整批 KV 2 GB，带宽 100 GB/s，batch=4。<br>搬运量=6+2=8 GB；t≥8÷100=0.08s=80ms。<br>单流≤1÷0.08=12.5 token/s；总吞吐≤4÷0.08=50 token/s。<br><br>Llama 3 8B 课堂近似权重：8×10⁹×2=16×10⁹ B=16 GB。<br>单请求 4096 长度 KV=0.536870912 GB，batch=8 → 4.294967296 GB。<br>H100 SXM 读带宽 3.35 TB/s=3350 GB/s。<br>t≥(16+4.294967296)÷3350=0.0060582s≈6.06ms。<br>单流理想上界≈165.07 token/s；整批≈1320.52 token/s。<br>这不是实测，未计通信、调度、计算、写入与低带宽效率。</div><p>实际的内存时间（memory time）和计算时间（compute time）可能重叠。更完整的下限应看 max（内存下限，计算下限）并分析通信关键路径。TTFT 还包括网络、排队、分词和首个输出的发送，不等于纯 Prefill 时间。</p>
+<h4>硬件对照 · 按本课指定规格</h4><div class="table-wrap"><table><thead><tr><th>指标</th><th>H100 SXM</th><th>B200（课内指定口径）</th></tr></thead><tbody><tr><td>显存（GPU memory）</td><td>80 GB</td><td>192 GB</td></tr><tr><td>HBM 带宽（HBM bandwidth）</td><td>3.35 TB/s</td><td>8 TB/s</td></tr><tr><td>BF16 稠密峰值（BF16 dense peak）</td><td>989 TFLOPS</td><td>本课不代入未指定值</td></tr><tr><td>FP8 稠密峰值（FP8 dense peak）</td><td>1979 TFLOPS</td><td>本课不代入未指定值</td></tr><tr><td>节点内互联（NVLink）</td><td>900 GB/s</td><td>1.8 TB/s</td></tr></tbody></table></div><p class="small">节点（node）是一台服务器。NVLink 是 GPU 间互联，不是 HBM 读带宽；上述互联数字为标称双向口径，不能直接当单向有效传输速度。H100 官方表带星号的稀疏峰值需区别于本课稠密值。B200 采用题目要求的 192 GB/8 TB/s 口径；实际系统的可用容量和 SKU 可能不同，不能由这张教学表直接做采购承诺。<a href="#src-hardware">[来源 3]</a></p>
+<div class="widget" id="decodeWidget"><span class="badge">计算器 3 / DECODE 带宽模型</span><h3>搬完这些数据，至少需要多久？</h3><div class="fields"><label>每步权重读取量（weights read）· GB<input id="decWeight" type="number" min="0" step="1" value="16"></label><label>整个 batch 的 KV 读取量 · GB<input id="decKv" type="number" min="0" step="0.1" value="4.294967296"></label><label>聚合有效带宽（effective bandwidth）· TB/s<input id="decBw" type="number" min="0.001" step="0.01" value="3.35"></label><label>批量大小（batch size）<input id="decBatch" type="number" min="1" step="1" value="8"></label></div><div class="pills" style="margin-top:12px"><button class="secondary" id="decToy">玩具例子</button><button class="secondary" id="dec8b">8B / H100</button><button class="secondary" id="dec500">500B 本练习假设 / 16 卡理想聚合</button></div><div id="decError" class="error" role="status"></div><div id="decResults" class="results" aria-live="polite"></div><p id="decWork" class="calc"></p><p class="small">所有 GB、TB/s 为十进制。输入的是每步实际需要读取的数据；普通稠密全注意力可用权重和整批 KV 总量估算。聚合峰值仅在均匀分片、同时工作时适用，流水线单流不能直接这样相加。结果为读取时间下限和相应速度上界，非实测保证。</p></div>
+<h3>常见误解</h3><p>带宽模型不能拿“单请求 KV”直接代替“整批 KV”；同一份权重在一个批次中可复用，不应无条件乘 batch。提高 batch 往往提高总吞吐，但不一定提高单流速度。多卡的 HBM 峰值相加不能消除通信或阶段串行。</p>
+<h3>练习题</h3><p>权重 10 GB，整个 batch 的 KV 为 10 GB，有效聚合带宽 2 TB/s，batch=5。理想下限和两个速度上界各是多少？</p><details><summary>查看答案 · 第 8 章</summary><div>2 TB/s=2000 GB/s；t≥20÷2000=0.01s=10ms。单流上界 100 token/s，总吞吐上界 500 token/s。实际时间更长，且随长度增加 KV 还会增长。</div></details>
+<div class="interview">我会把延迟拆成首词元和后续词元。TTFT 包含排队、输入处理和 Prefill，TPOT 描述后续生成间隔。Prefill 同时处理很多位置，权重可以被复用，通常更偏算力密集；小批量 Decode 每步新位置少，却要读取权重和历史 KV，通常更偏访存密集。我会先用字节数除带宽估一个理想下限，例如 16 GB 权重加四点三 GB 整批 KV，除以 H100 的 3350 GB 每秒，约六毫秒。它只给读取下限，不能直接宣称线上能达到相应速度。批量为八时，每步通常产生八个总输出，因此总吞吐约是单流速度乘八。最后还要测计算、通信和调度，尤其不能把多卡峰值带宽机械相加到流水线单流延迟里。</div></section>
+<section class="chapter" id="c9" data-title="09 500B agent chat 设计练习"><div class="num">CHAPTER 09 / 容量、拓扑与准入</div><h2>500B 模型托管智能体对话（agent chat）</h2>
+<div class="note"><b>先说假设：这不是某个真实模型的官方配置。</b><br>500B 中 B 表示十亿（billion），500B=500×10⁹ 个参数。以下 96 层、8 个 KV 头、每头 128 维、bf16 KV、上下文分布和 SLO 都是<b>本练习假设</b>；不得引用为真实 500B 模型的配置。</div>
+<h3>定义 → 先澄清需求，再算资源</h3><p><b>参数（parameter）</b>是模型里可学习的数字，权重（weight）是其主体。<b>稠密模型（Dense model）</b>通常每个词元使用各层完整的主要权重。<b>混合专家模型（Mixture of Experts，MoE）</b>在某些层配置多组子网络，叫专家（expert），由路由器（router）为每个词元选择部分专家。<b>总参数（total parameters）</b>是全部参数数目；<b>激活参数（active parameters）</b>是一次处理某个词元时实际使用的那部分。MoE 可以总参数大、激活参数少，但总权重仍需放在某处。</p><p><b>智能体（agent）</b>是会调用工具、接收结果、再继续推理的程序；<b>系统提示词（system prompt）</b>是它重复遵循的开头规则；<b>工具调用（tool call）</b>是向外部工具请求操作并把返回结果接回对话。<b>分位数（percentile，p50/p95）</b>表示排序后有 50%/95% 的样本不超过该值；<b>最大值（maximum，max）</b>是允许的最高值。<b>服务等级目标（Service Level Objective，SLO）</b>是服务要达到的性能目标，例如 p95 的 TTFT 不超过某个时限。</p><p><b>副本（replica）</b>是一套可以独立服务的完整模型部署，可以跨多张 GPU。<b>每秒请求数（Queries Per Second，QPS）</b>是每秒进入或完成的请求数量，需说明口径。<b>准入控制（admission control）</b>是先检查资源预算，允许一部分请求进入运行，其余排队或拒绝。</p>
+<h4>Clarify 清单 · 面试开场逐项问清楚</h4><ol><li>500B 是稠密（Dense）还是混合专家（MoE）？指总参数（total parameters）还是激活参数（active parameters）？</li><li>权重（weights）用 bf16 还是 fp8？KV 格式另行确认；是否接受精度变化？</li><li>并发（concurrency）、到达 QPS、上下文 p50/p95/max 各是多少？长度包含多少历史与预留输出？</li><li>输入输出比（input/output ratio）是多少？长输入短输出，还是短输入长输出？</li><li>TTFT、TPOT 的 SLO 看哪个分位数？峰值流量持续多久？</li><li>agent 是否共享系统提示词（system prompt）？多轮工具调用（tool call）等待时，缓存保留多久？</li><li>可用 GPU 型号、每节点卡数、互联拓扑（interconnect topology，即设备怎样连接）、成本上限和备用容量是多少？</li></ol>
+<h3>直观类比</h3><p>先确定图书馆服务对象、书籍规模和借阅频率，再决定书架与通道。只知道“500B”就报卡数，像只知道书很多，却不知道借书的人是否会同时到达。</p>
+<h3>具体例子与本练习假设</h3><p>本练习假设：500B <b>总参数稠密模型</b>；96 层（Layer）、8 个 KV 头（Key-Value head）、每头维度（head_dim）128；KV 始终 bf16。上下文分布<b>本练习假设</b>为 p50=8k、p95=32k、max=128k，已含输出预算；常见回合输入:输出=8:1；共享 2k 系统提示词；练习目标 p95 TTFT≤2s、TPOT≤50ms，均须通过实测验证，并非该硬件必然能达到。</p><p>agent 先读“王芳买了苹果，她问它的热量”，调用营养工具，再接着回答；另一请求问“苹果发布电脑，它的内存多大”，调用产品工具。共享开头规则可以复用，涉及代词和苹果含义的请求内容不同，不能随意共享整段缓存。</p>
+<h3>一步步计算 → 权重、KV、副本</h3><div class="calc">先用玩具：1000 个参数，bf16 每个 2 B → 1000×2=2000 B 权重；fp8 → 1000 B。<br>可用显存若为 4000 B×0.9=3600 B，扣 bf16 权重后只剩 1600 B，而不是 3600 B。<br><br>本练习 500B 权重：<br>bf16：500×10⁹×2=1,000,000,000,000 B=1000 GB。<br>fp8：500×10⁹×1=500,000,000,000 B=500 GB。<br>这些仅为参数载荷，未计缩放因子、工作区和通信缓冲。<br><br>本练习假设 KV：96 层、8 KV 头、128 维、bf16。<br>单层单词元元素数=2×8×128=2048；跨 96 层=196,608 个元素。<br>×2 B=393,216 B=384 KiB/词元（课堂写 384 KB/token）。<br>8k：196,608×8192=1,610,612,736 个元素 → 3,221,225,472 B=3 GiB≈3.221 GB。<br>32k：8k 的 4 倍=12 GiB≈12.885 GB。<br>128k：8k 的 16 倍=48 GiB≈51.540 GB。<br>课堂近似分别说“约 3 GB、12 GB、48 GB”。<br><br>本练习副本：16 张 H100 SXM，每张按题目 80 GB。<br>总显存=16×80=1280 GB；可用比例 0.90 → 1280×0.90=1152 GB。<br>bf16 权重后简化 KV 池=1152−1000=152 GB。<br>fp8 权重后简化 KV 池=1152−500=652 GB。<br>此处 10% 余量统一包揽运行开销，若仍不足需额外扣除，不能重复花掉。</div>
+<div class="table-wrap"><table><thead><tr><th>权重格式 / 简化池</th><th>8k：课堂近似 / 精确字节</th><th>32k：课堂近似 / 精确字节</th></tr></thead><tbody><tr><td>bf16 / 152 GB</td><td>⌊152÷3⌋=50<br>⌊152÷3.221225472⌋=<b>47</b></td><td>⌊152÷12⌋=12<br>⌊152÷12.884901888⌋=<b>11</b></td></tr><tr><td>fp8 / 652 GB，KV 仍 bf16</td><td>⌊652÷3⌋=217<br>⌊652÷3.221225472⌋=<b>202</b></td><td>⌊652÷12⌋=54<br>⌊652÷12.884901888⌋=<b>50</b></td></tr></tbody></table></div><p>⌊x⌋ 表示向下取整（floor），只允许完整请求进入。因此题目要求的<b>“8k 约 50 并发、32k 约 12 并发”是课堂近似</b>；若 GPU 容量和权重都按十进制 GB 严格代入，实际容量上界为 47、11，且上线还应更保守。把 152 当 GiB 才会恰得 50、12，但不能同时声称来自十进制的 1280−1000。计算器坚持精确字节，不会悄悄混用。</p>
+<h4>并行术语 → 定义与例子先行</h4><p><b>张量并行（Tensor Parallelism，TP）</b>是把一层的大矩阵拆到多张 GPU，每层通过集合通信（collective communication，即多卡交换并汇总数据）协作。例如 8 张卡共同完成同一层的乘法。<b>流水线并行（Pipeline Parallelism，PP）</b>是把不同层放到不同 GPU 组，例如前 48 层在节点 A，后 48 层在节点 B。<b>数据并行（Data Parallelism，DP）</b>在推理场景常指部署多个完整副本，分别接不同请求。<b>专家并行（Expert Parallelism，EP）</b>是把 MoE 的不同专家分到不同设备，词元经全到全通信（all-to-all，即向多个目标分别发送数据）送给对应专家。</p><p><b>微批次（microbatch）</b>是把大批次拆成的小份，让 PP 各阶段交错工作。<b>流水线气泡（pipeline bubble）</b>是一些阶段等输入或等其他阶段而空闲的时间。例如两个阶段只有一份工作时，后一阶段要先等前一阶段完成。</p><div class="calc">本练习拓扑选择：2 个节点×每节点 8 张 H100。<br>TP=8 放节点内；PP=2 跨节点；TP×PP=16 张卡构成一个副本。<br>96 层均分：每阶段 48 层；权重约 1000÷2÷8=62.5 GB/卡。<br>每卡 80×0.9−62.5=9.5 GB 简化 KV 预算；16×9.5=152 GB。<br>8 个 KV 头恰好可在 TP=8 时分到每卡 1 个，假设实现支持且分配均匀。<br>若增加 DP=2：2 个副本共需 32 卡，容量与总 QPS 有望提高，单请求不自动加快。</div><p><b>为什么通常不把 TP 跨节点？</b>TP 每层都要同步，网络带宽与延迟容易反复进入每个词元的关键路径；节点内 NVLink 更适合这种高频交换。PP 只在阶段边界传中间隐藏向量（hidden vector），跨节点通信次数少，但有串行与气泡代价。TP 跨节点<b>可以实现</b>，并非逻辑上“不行”；只有拓扑与实测说明收益可接受时才选择。MoE 还需同时考虑 EP 的路由负载和 all-to-all 成本。</p>
+<h4>空间分配与三项服务优化</h4><p><b>最大运行序列数（max_num_seqs）</b>是服务引擎允许同时运行的序列上限。例如按 p95=32k 做基线，bf16 权重场景容量上界是 11，而非把 8k 的 47 当所有请求都安全的上限。max=128k 的长请求还要逐个按实际预算准入，必要时独立队列；p95 不是最大值保护。</p><p><b>分页注意力（PagedAttention）</b>把 KV 按固定大小的块分配，通过块表找到逻辑连续、物理可不连续的数据，减少预先保留整条最大长度造成的浪费；但块尾仍可能有少量空隙。<b>前缀缓存（prefix caching）</b>复用完全相同开头的已算 KV，省重复 Prefill；匹配必须包括相同词元前缀、模型版本和位置等配置。例如 100 个请求共用 2k 规则，一份公共块可通过引用计数（reference counting，即记录还有多少请求在用）共享，结束后归还独占块。<a href="#src-serving">[来源 4]</a></p><p><b>分块预填充（Chunked Prefill）</b>把长提示词拆成多块穿插执行，避免一次大 Prefill 长时间阻塞正在 Decode 的请求；它主要平衡延迟和调度，不能神奇地消除总 KV。<b>预填充/解码分离（Prefill/Decode disaggregation）</b>让两阶段用不同资源池，各自扩缩和优化；代价是跨池搬运 KV、路由和容量管理。其收益必须大于 KV 迁移成本。<a href="#src-serving">[来源 4]</a></p><div class="flow"><span>澄清分布与 SLO</span><span>扣权重与运行余量</span><span>按实际长度准入</span><span>超预算排队</span><span>实测后调副本</span></div>
+<h3>常见误解</h3><p>激活参数少不代表只需要存那一点权重。fp8 权重不意味着 KV 也改成 fp8。总显存相加可装下不等于拓扑可高效服务。p95 控制常见负载，最大长度仍需单独预留。152 GB 是简化容量池，不是一定能用于线上请求的承诺。</p>
+<h3>练习题</h3><p>在本练习假设下，bf16 权重副本同时收到 12 个 32k 请求，严格按十进制 GB 能全部准入吗？若有共享前缀，是否就可无条件放行？</p><details><summary>查看答案 · 第 9 章</summary><div>不能。12×12.884901888=154.618822656 GB，超过 152 GB；单按容量上限最多 11 个，额外开销可能进一步降低。共享前缀只有在真正命中、支持物理共享、已经扣除公共块后才能重新预算。应按可用块和输出增长预算准入，不能凭“可能命中”放行。</div></details>
+<div class="interview">我会先确认 500B 指总参数还是激活参数、Dense 还是 MoE，以及精度、上下文分位数、输入输出比、SLO 和工具调用模式。以本练习稠密假设为例，bf16 权重约 1000 GB，fp8 约 500 GB；96 层、八个 KV 头、128 维和 bf16 KV 给出每词元 384 KiB，8k 约 3 GiB，32k 约 12 GiB。16 张 H100 按九成容量，扣 bf16 权重后简化剩 152 GB，课堂近似能说约五十个 8k 请求，但严格按十进制是四十七个；32k 则是十一个。我倾向节点内 TP8、跨节点 PP2，增加副本扩总 QPS；MoE 再分析 EP。最后按 p95 设运行基线、对超长请求单独准入排队，并用前缀复用、分块 Prefill 或阶段分离解决各自瓶颈。容量只给起点，SLO 还需用真实流量验证。</div></section>
+<section class="chapter" id="c10" data-title="10 集群怎么分给三类负载"><div class="num">CHAPTER 10 / 集群资源治理</div><h2>GPU 集群（GPU cluster）：训练、推理与强化学习</h2>
+<h3>定义 → 负载与调度</h3><p><b>集群（cluster）</b>是多台节点（node）组成的资源集合；<b>负载（workload）</b>是要运行的任务；<b>调度（scheduling）</b>是决定任务何时、在哪些设备上运行。<b>强化学习（Reinforcement Learning，RL）</b>是利用奖励信号改进模型的训练方式。在大语言模型的在线强化学习中，<b>采样生成（rollout）</b>是让当前模型生成候选回答或交互轨迹，再按奖励更新模型，因此会交替出现推理与训练负载。</p><p><b>成组调度（gang scheduling）</b>是为一个分布式任务准备好整组资源后再启动，避免八张卡只拿到七张而互相等待。<b>检查点（checkpoint）</b>是可恢复训练状态的快照，通常包括模型参数、优化器状态（optimizer state，即更新参数所需的辅助数据）和进度。<b>抢占（preemption）</b>是为更高优先级任务收回资源；训练如果能从检查点恢复，较适合被受控抢占。对正在服务的在线推理，抢占会中断请求并破坏 SLO，应重点保障。</p>
+<h3>直观类比</h3><p>训练像预约一整队工人的大工程，缺人就无法开工；推理像必须准点发车的公交；RL 像潮汐车流，生成答案时需要一批车，回去更新模型时又转成另一类工作。</p>
+<h3>具体例子</h3><p>训练用“王芳拿苹果，她吃了它”和“苹果发布电脑，它很轻”等样本学习语义；推理要即时响应同类提问；RL 则先生成多种含代词的回答、评估奖励，再更新模型。这三种工作可使用相同 GPU，却有不同的中断容忍度和时序。</p>
+<div class="table-wrap"><table><thead><tr><th>画像（workload profile）</th><th>训练（training）</th><th>推理（inference）</th><th>强化学习（RL）</th></tr></thead><tbody><tr><td>资源形态</td><td>持续多卡、同步通信密集</td><td>随流量变化，重延迟与 KV</td><td>rollout 与更新交替形成脉冲</td></tr><tr><td>调度要求</td><td>成组启动、拓扑一致</td><td>保障池、预热与快速扩缩容</td><td>分阶段配额，避免资源相互等待</td></tr><tr><td>能否被打断</td><td>可从检查点受控恢复，仍有代价</td><td>活动请求不能任意中断</td><td>训练阶段可恢复；rollout 需保存状态或重试</td></tr><tr><td>主要代价</td><td>损失检查点之后的进度</td><td>SLO 违约、请求失败、重建缓存</td><td>阶段切换、模型同步与数据等待</td></tr></tbody></table></div>
+<h4>容器编排（Kubernetes）中的机制：定义 → 小例子</h4><p><b>Kubernetes</b>是管理容器化任务与节点资源的系统；<b>容器（container）</b>是封装程序及运行环境的方式；<b>容器组（Pod）</b>是 Kubernetes 的基本调度单元，例如一个推理进程及其辅助程序一起部署。</p><ul><li><b>节点池（node pool）</b>：按硬件或用途分组的节点。例如 H100 在线推理池和训练池，分别管理容量。</li><li><b>污点（taint）/容忍（toleration）</b>：污点阻止不匹配的容器组进入，容忍允许其进入。例如给推理节点加专用污点，只有被授权的容器组容忍它。容忍只是“准许”，不是“保证放上去”；还需节点选择器（node selector）或节点亲和性（node affinity，即约束选择哪些节点）。</li><li><b>GPU 设备插件（GPU device plugin）</b>：把 GPU 作为可申请资源公布给 Kubernetes。例如容器组申请 8 个 <code>nvidia.com/gpu</code>。插件本身不解决模型拓扑、KV 或多任务隔离。</li><li><b>资源配额（resource quota）</b>：限制某团队或命名空间（namespace，即资源管理分组）能申请多少资源。例如训练最多用 32 张卡，避免无限挤占。</li><li><b>优先级（priority）</b>：表达任务相对重要程度。例如推理高于可恢复训练。优先级本身不保证自动完成检查点；必须设计通知、宽限期与恢复流程。</li><li><b>成组调度（gang scheduling）</b>：例如 16 卡训练必须同时得到两台 8 卡节点。通常要搭配批处理调度器或队列管理器，不能把普通逐个 Pod 调度当成自动成组。</li><li><b>整节点分配（whole-node allocation）</b>：把一台 8 卡节点整体交给一组任务，减少碎片（fragmentation，即总量够但分散后无法满足任务）的同时保持高速互联。会牺牲部分细粒度利用率。</li></ul><p class="small"><a href="#src-k8s">[来源 5]</a> 这些机制各管一部分；“GPU 可被申请”不等于“具备成组调度和严格 SLO 保障”。</p>
+<h3>一步步计算</h3><div class="calc">玩具：2 台节点，每台 4 张 GPU。各节点已占用 1 张。<br>总空闲=2×3=6 张，但要求单节点 4 卡的 TP 作业仍放不下。<br>“总空闲 6≥4”不能推导出任务可运行。<br><br>沿用本练习 16 张 H100/副本：假设有 64 张，即 8 台 8 卡节点。<br>推理保障池保留 32 张=2 个副本；共享池 32 张=4 个节点。<br>训练可借共享池 16 张=2 节点；推理突增需加 1 副本时，要收回完整 16 张。<br>若训练每 10 分钟存检查点，任意时刻抢占最坏可能重做近 10 分钟训练，<br>还要加保存、退出、加载 1000 GB 权重和预热时间；不能声称瞬时扩容。</div>
+<p><b>折中方案：</b>建立“推理保障池 + 训练共享池”。保障池预留在线最低容量；共享池允许训练借用空闲卡，约定可随时被抢回的资源权利，但实际回收仍有有限延迟。为峰值准备预热副本（warm replica，即权重已载入且初始化完成的备用服务）、预测扩容和训练检查点流程。RL 按阶段从共享队列申请资源，记录阶段切换，避免两个阶段各占资源却互等。</p>
+<h3>常见误解</h3><p>训练可被抢占不等于训练不重要；在线推理不能被随意打断不等于永远不能迁移，需要先排空（drain，即停止新请求并等已有请求完成）或有状态迁移。配额不自动消除碎片，容忍不保证调度，设备插件不等于完整 GPU 调度系统。快速扩缩容仍受大权重加载限制。</p>
+<h3>练习题</h3><p>4 台 8 卡节点各剩 4 卡，合计空闲 16 卡，是否足够放进需要 TP8×PP2、要求每阶段独占一个 8 卡节点的本练习副本？</p><details><summary>查看答案 · 第 10 章</summary><div>不够。总量虽是 16 卡，却没有两台各完整 8 卡的节点。必须成组收回两台节点或重排可恢复任务。把 4+4 卡跨节点凑成 TP8 会改变既定拓扑，必须重新评估通信和 SLO。</div></details>
+<div class="interview">我会先按可中断性和资源形态分池。训练需要成组拿到多卡，通信拓扑稳定，能通过检查点受控恢复；在线推理有硬延迟目标，要有最低保障和预热容量，不能直接被训练挤掉；RL 则把 rollout 和更新分阶段调度，因为两者会交替形成资源脉冲。Kubernetes 上，设备插件暴露 GPU，节点池和污点容忍隔离用途，配额限制团队占用，优先级表达资源收回顺序，成组调度保证分布式任务一起启动。我倾向关键推理用保障池，训练在共享池运行并借用空闲资源，峰值时按约定归还。这个归还不是零延迟，必须预算检查点、退出、权重加载和预热。最后尽量按整节点分配高速并行组，避免看起来空闲很多，却因卡散在多个节点而无法启动。</div></section>
+<section class="chapter" id="c11" data-title="11 先定位，再优化"><div class="num">CHAPTER 11 / 性能诊断</div><h2>性能调试（performance debugging）：先确定慢在哪里</h2>
+<h3>定义 → 先给指标命名</h3><p><b>性能调试（performance debugging）</b>是用可复现输入和测量证据寻找瓶颈，再验证优化是否有效；例如同一长度和并发下比较两次 TPOT，而不是凭感觉加卡。<b>流式多处理器（Streaming Multiprocessor，SM）</b>是 GPU 执行计算的单元；<b>SM 利用率（SM utilization）</b>描述观测区间内这些单元的活跃情况，具体计数器定义依工具而异，不等于有效模型运算比例。</p><p><b>显存带宽利用率（memory bandwidth utilization）</b>是实际搬运字节速率相对参考峰值的比例。<b>模型算力利用率（Model FLOPs Utilization，MFU）</b>是有效模型运算量÷运行时间÷对应硬件稠密峰值，例如实际 100 TFLOPS 对 1000 TFLOPS 为 10%；需要说明运算计数方法、精度和是否包含注意力。<b>KV 池利用率（KV pool utilization）</b>是已占缓存块相对可用块的比例。<b>前缀命中率（prefix hit rate）</b>是复用前缀的比例，必须说明按请求数还是按词元数统计。</p><p><b>排队时间（queueing time）</b>是请求等候准入与执行的时间。<b>抢占次数（preemption count）</b>在这里指推理引擎因缓存压力暂停、换出或重算请求的次数，不同于上一章的 Kubernetes 作业抢占。<b>投机解码（speculative decoding）</b>用较便宜的草稿模型（draft model）或预测机制提出多个候选，再由目标模型（target model）验证，争取一次接受多个输出；例如一次验证三个候选而接受两个。收益取决于接受率和验证成本。</p>
+<h3>直观类比</h3><p>餐厅慢可能是门口排队、厨房做首道菜慢，或后续上菜间隔长。先看哪一段耽误时间，再决定加厨师、拓宽传菜通道还是改排单方式。</p>
+<h3>具体例子</h3><p>“她拿苹果，它很甜”与“苹果发布电脑，它很轻”如果长度和输出预算匹配，可以组成可复现测试组；代词不同不能让我们跳过长度控制。若真实 agent 加入工具结果，输入可能突然变长，应把这些回合单独统计，避免平均值掩盖 p95。</p>
+<h3>按这个次序排查</h3><ol><li><b>先分症状：</b>TTFT 慢，拆排队、分词、Prefill、首输出传输；TPOT 慢，查看 Decode 步时和长尾；吞吐低，核实到达负载是否足够以及统计的是词元还是请求。</li><li><b>再对齐测试条件：</b>记录模型版本、精度、输入/输出长度分布、并发和前缀是否预热。避免拿短输入热缓存对比长输入冷缓存。</li><li><b>再看指标组合：</b>SM 活跃但带宽低，检查小算子、同步与调度空隙；带宽接近上限而 MFU 低，可能是正常的访存瓶颈；KV 池高、抢占增多、排队变长，先检查长度预算、准入和缓存块回收；前缀命中低，检查实际词元前缀和路由。</li><li><b>然后看多卡：</b>测 TP 跨节点通信是否占关键路径；看 PP 气泡和阶段负载是否失衡。不能把卡数增加当成通信变快。</li><li><b>最后做有针对性的优化：</b>容量不足才评估加卡或低精度；带宽不足才评估换卡、增加批量或缩短上下文；低并发的逐步生成可评估投机解码。每次改一项，复测质量、TTFT、TPOT 和成本。</li></ol>
+<h3>一步步计算</h3><div class="calc">玩具：TTFT=排队 120ms+分词 5ms+Prefill 60ms+发送 15ms=200ms。<br>若将 Prefill 加速一倍：新 TTFT=120+5+30+15=170ms，仅改善 15%。<br>不能把纯计算提速 2 倍说成端到端提速 2 倍。<br><br>Llama 3 8B 示例：上一章带宽模型每步读取约 20.295 GB。<br>若实测步时 10ms，推算平均有效读取带宽=20.295÷0.010=2029.5 GB/s。<br>相对 3350 GB/s 峰值=60.58%；这只是估算，应以硬件计数器校验。<br>若本练习 16 张 H100 的 bf16 峰值=16×989=15,824 TFLOPS，<br>测得有效模型计算为 4000 TFLOPS，则 MFU=4000÷15,824≈25.28%。<br>4000 是教学测量假设，不是 500B 实测结果，也不是 Decode 的必达 MFU。</div>
+<h3>常见误解</h3><p>SM 利用率高不等于吞吐好；Decode 的低 MFU 不一定是实现糟糕；缓存占满有时是有益前缀保留，但若持续抢占与排队，就是压力信号。fp8 不保证端到端翻倍；投机解码也不保证高接受率。先验证瓶颈再投入。</p>
+<h3>练习题</h3><p>p95 TTFT 很慢，但 Prefill 计算时间稳定，排队从 20ms 涨到 800ms；TPOT 正常。首先做什么？</p><details><summary>查看答案 · 第 11 章</summary><div>先检查到达流量、准入上限、可用副本、KV 预算与长请求占用，确认队列为何积压。扩副本或改变队列策略可能有帮助，但不能把优化注意力算子当首选。复测需看 p95 排队与端到端 TTFT，防止只把等待挪到别处。</div></details>
+<div class="interview">我会先分清是首词元慢、后续每词元慢，还是总体吞吐不足，并把端到端时间拆开。TTFT 慢先看队列和 Prefill，TPOT 慢先看 Decode 的内存与通信路径，吞吐低还要确认负载和批次是否喂足。然后同时看 SM、带宽、MFU、KV 池、前缀命中、抢占和排队，避免单指标误判。例如带宽已高而 MFU 低，可能符合访存密集的预期；KV 紧张伴随抢占，则更像容量和准入问题。多卡再看 TP 的跨节点同步，以及 PP 的气泡和阶段失衡。最后才决定加卡、换卡、低精度或投机解码，每项都通过受控对比验证。目标不是让某个利用率数字好看，而是在质量和成本约束下达成延迟与吞吐目标。</div></section>
+<section class="chapter" id="c12" data-title="12 长上下文与多级 KV 缓存"><div class="num">CHAPTER 12 / 热数据与冷数据</div><h2>缓存卸载（KV Cache Offload）与多级缓存（Multi-Tier KV Cache）</h2>
+<h3>定义</h3><p><b>缓存卸载（KV Cache Offload）</b>是把部分 KV 从 GPU 显存移到其他存储，在需要时再取回，例如把暂停会话的 KV 放到主机内存。<b>多级缓存（Multi-Tier KV Cache）</b>按访问频率与速度把数据放到不同层级。<b>热数据（hot data）</b>是近期频繁使用的数据，例如正在 Decode 的请求所需 KV；<b>冷数据（cold data）</b>是不常使用的数据，例如长时间暂停的会话。</p><p><b>中央处理器（Central Processing Unit，CPU）</b>是主机的通用处理器；<b>动态随机存取内存（Dynamic Random-Access Memory，DRAM）</b>是主机内存。<b>高速外设互联（Peripheral Component Interconnect Express，PCIe）</b>连接主机与 GPU，卸载数据常需经过它；本课用有效单向 64 GB/s 做演算假设，不把双向合计标称值直接代入。<b>非易失内存快速接口固态盘（NVMe SSD）</b>是通过 NVMe 协议访问的固态存储；<b>远端存储（remote storage）</b>是需经网络访问的存储。</p><p><b>预取（prefetch）</b>是在计算真正需要前先搬数据，例如处理当前层时提前搬下一层 KV；<b>窗口注意力（sliding-window attention）</b>是按模型设计只读取最近一段历史的注意力，例如只读最近 4096 个位置。全注意力（full attention）要访问全部可见历史，不能擅自丢远处 KV 而宣称计算结果等价。</p>
+<h3>直观类比</h3><p>HBM 像桌面，CPU DRAM 像房间里的柜子，SSD 像档案室，远端像外地仓库。正在写文章时，把每一步都要翻的整本资料运去外地，桌面空了，但写作会被搬运拖慢。</p>
+<h3>具体例子</h3><p>agent 问“她拿起苹果，她把它放在哪里？”后等工具一分钟，暂停会话的 KV 可以换出；工具回来再搬回。“苹果好吃”与“苹果发布电脑”可以共享相同规则前缀，却不能因为都有“苹果”就共享请求专属数据。只有完整相同前缀和兼容配置才能正确复用。</p>
+<div class="table-wrap"><table><thead><tr><th>层级（tier）</th><th>适合放什么</th><th>取舍（trade-off）</th></tr></thead><tbody><tr><td>HBM</td><td>正在 Decode 的热请求；当前计算所需层或块</td><td>速度快，容量贵且有限</td></tr><tr><td>CPU DRAM</td><td>暂停、换出的请求；跨轮会话；共享前缀的较温层</td><td>容量大，搬入 GPU 受 PCIe 等链路限制</td></tr><tr><td>NVMe SSD</td><td>较冷会话、归档、持久化前缀库</td><td>高容量，但加载延迟与带宽更受限</td></tr><tr><td>远端存储（remote storage）</td><td>跨机器共享前缀库、长期归档</td><td>还需网络传输、目录索引与失效管理</td></tr></tbody></table></div>
+<h4>四种用法：每一种都先明确何时搬</h4><ol><li><b>抢占换出（preemption with swapping）</b>：缓存紧张时把暂停请求移到 DRAM，恢复时搬回，避免重做整个 Prefill。是否比重算便宜取决于两次搬运成本和原 Prefill 成本，不能直接照搬某引擎的默认抢占策略。</li><li><b>按层或窗口分层（layer/window tiering）加预取（prefetch）</b>：HBM 只放当前需要的层或按模型窗口保留热块，提前取下一部分。它可降低驻留容量，但全注意力每步的总历史读取量不会因分层自动减少；预取只有在搬运能被计算掩盖时才有益。窗口改变必须符合模型本身的语义。</li><li><b>会话与前缀分层（session/prefix tiering）</b>：不活跃会话和公共前缀先留 DRAM、SSD 或远端，需要时一次性恢复到热层。它减少重复 Prefill 和空闲驻留，但复用之后的 Decode 仍须及时获得这些 KV。</li><li><b>全量卸载（full offload）</b>：让绝大多数 KV 常驻主机并在每步搬入；在本课全注意力和 PCIe 假设下通常只适合离线（offline，即不要求即时响应）、低 QPS、对延迟宽松的任务。不能仅凭“内存够大”保证交互聊天体验。特殊互联或稀疏算法需另算。</li></ol>
+<h3>一步步计算 → 为什么热 Decode 不能整本搬</h3><div class="calc">玩具：热 KV 共 1 GB，每一步都要读。<br>本地带宽 100 GB/s → 1÷100=0.01s=10ms。<br>外部链路 4 GB/s → 1÷4=0.25s=250ms。<br>分 10 块预取，每块耗时虽小，总字节数仍为 1 GB。<br><br>Llama 3 8B 形状外推：128k=131,072 词元，bf16 KV。<br>每词元 65,536 个元素；总元素=65,536×131,072=8,589,934,592。<br>乘 2 B=17,179,869,184 B=16 GiB≈17.180 GB。<br>HBM：17.180÷3350=0.005128s≈5.13ms/步，仅算 KV 读取。<br>PCIe 假设有效单向 64 GB/s：17.180÷64=0.268435s≈268ms/步。<br>课堂十进制圆整：把“16 GB”直接代入 → 16÷3350≈4.78ms，16÷64=250ms。<br>所以常说“HBM 约 5ms，PCIe 约 250ms”，严格单位对应约 5.13ms 与 268ms。<br>这还没算权重、计算与软件开销，整本逐步搬运会限制交互速度。</div><div class="note">这里是<b>按 Llama 3 8B 的 KV 形状做 128k 容量外推</b>。原版 Llama 3 8B 的官方上下文为 8192，并不支持直接据此认定能正确处理 128k。支持长上下文需要对应模型与位置配置；形状估算不能证明模型能力。</div>
+<div class="calc">再算一次性恢复的取舍：若同一 16 GiB 会话从 DRAM 恢复一次，理想搬回约 268ms。<br>若随后在 HBM 中连续输出 100 个词元，平均分摊恢复开销≈268÷100=2.68ms/词元。<br>若每个词元都完整从 DRAM 搬一次，则约 268ms/词元。<br>若换出后还要搬回，总搬运下限约 2×268=536ms；应与重算 Prefill 的实测时间比较。</div>
+<h3>常见误解</h3><p>DRAM 本身的带宽不等于 GPU 读取它的端到端带宽；要看最窄链路与 NUMA 拓扑（Non-Uniform Memory Access topology，即主机不同内存位置的访问代价差异）。共享前缀不意味着生成时再也不读它。预取能重叠时间，不能消灭字节。缓存恢复还要校验模型、词元前缀、位置、数据格式、并行布局和租户权限，错误复用会破坏正确性。</p>
+<h3>练习题</h3><p>一个 8 GB 冷会话通过有效 32 GB/s 链路恢复，理想恢复多久？若要求热 Decode 每步≤50ms，可以每步全量搬入这 8 GB 吗？</p><details><summary>查看答案 · 第 12 章</summary><div>8÷32=0.25s=250ms。仅搬运已超过 50ms，因此无法按这个全量逐步搬运方案达标。可把暂停会话放冷层、恢复后驻留 HBM，或者采用经过验证的其他算法或互联；不能把冷层总容量当成热层有效容量。</div></details>
+<div class="interview">我会按热度而不是只按容量设计 KV 多级缓存。正在逐步解码的热数据尽量放 HBM，暂停会话与可恢复前缀放主机内存，较冷内容和共享库再放 SSD 或远端。卸载主要有四种用途：抢占换出避免重算，按层或窗口分层并预取，跨轮会话与前缀复用，以及延迟宽松的全量卸载。关键是算数据路径：按 8B 的形状，128k KV 是 16 GiB，H100 HBM 理想读取约五毫秒，而有效 64 GB 每秒的 PCIe 链路约需 268 毫秒；课堂圆整可说约 250 毫秒。若每步都搬，交互速度会很差。冷会话一次性恢复再留在 HBM 则可以分摊开销。预取不能消除总流量，全注意力也不能随意丢远历史；最终要比较搬运、重算与 SLO。</div></section>
+<section class="chapter" id="selfcheck" data-title="13 五分钟速答自检"><div class="num">RECALL / 5 MINUTES</div><h2>五分钟速答自检（five-minute self-check）</h2><p>每题约 30 秒。先口述再展开核对；“已掌握”只表示你自己的判断。计时器为可选，不影响阅读。</p><div class="pills"><button id="timerStart">开始 / 重新计时 5 分钟</button><button id="timerPause" class="secondary">暂停 / 继续</button><span id="timerText" role="timer" aria-label="剩余自检时间">05:00</span></div><div id="quizList" class="checklist"></div><p id="quizScore" class="small" aria-live="polite">已掌握 0 / 10 项</p><button id="quizReset" class="secondary">清空掌握标记</button></section>
+<section class="chapter" id="glossary" data-title="14 中英术语对照表"><div class="num">REFERENCE / GLOSSARY</div><h2>中英术语对照表（Glossary）</h2><p>按学习顺序排列，搜索中文、英文或缩写。简要定义用于回忆，首次学习请回到对应章节看例子与推导。</p><label for="glossSearch">筛选术语（filter terms）</label><input id="glossSearch" type="search" placeholder="例如：每头维度、preemption、TTFT"><p id="glossCount" class="small"></p><div class="table-wrap"><table><thead><tr><th>中文术语</th><th>英文原名 / 缩写</th><th>一句话定义</th></tr></thead><tbody id="glossRows"></tbody></table></div></section>
+<section class="chapter" id="sources" data-title="15 来源与计算边界"><div class="num">EVIDENCE / PRIMARY SOURCES</div><h2>来源与计算边界</h2><p>核对日期：2026 年 11 月 2 日。以下链接用于进一步查证；课件本身不加载外部脚本、字体或模型，离线时仍可使用计算器。所有 500B 配置、流量分布、SLO 和演示测量值均为本练习假设。</p><ol><li id="src-llama"><b>模型形状与注意力实现：</b><a href="https://facebookresearch.github.io/fairseq2/stable/_modules/fairseq2/models/llama/config.html" target="_blank" rel="noopener noreferrer">Meta / fairseq2 的 Llama 配置</a>；<a href="https://github.com/meta-llama/llama3/blob/main/llama/model.py" target="_blank" rel="noopener noreferrer">Meta Llama 3 官方模型代码</a>。核对层数、隐藏维度、Q/KV 头数、词表、因果注意力、RoPE 与输出投影。原版 8B/70B 最大上下文为 8192。</li><li id="src-z"><b>z-loss：</b><a href="https://github.com/google-research/t5x/blob/main/t5x/losses.py" target="_blank" rel="noopener noreferrer">Google Research T5X 损失函数实现</a>。该实现展示交叉熵上叠加系数乘 logsumexp 平方；这里只说明背景，不声称 Llama 使用该损失。</li><li id="src-hardware"><b>硬件：</b><a href="https://www.nvidia.com/en-gb/data-center/h100/" target="_blank" rel="noopener noreferrer">NVIDIA H100 规格表</a>；<a href="https://www.nvidia.com/en-au/data-center/hgx/" target="_blank" rel="noopener noreferrer">NVIDIA HGX 平台与 NVLink 规格</a>。H100 使用本课指定稠密峰值。B200 本课固定采用题目指定的 192 GB、8 TB/s、1.8 TB/s，不将其解释为任意实机可用容量的保证。</li><li id="src-serving"><b>服务机制：</b><a href="https://docs.vllm.ai/en/stable/features/automatic_prefix_caching/" target="_blank" rel="noopener noreferrer">vLLM 前缀缓存</a>；<a href="https://github.com/vllm-project/vllm/blob/main/docs/configuration/optimization.md" target="_blank" rel="noopener noreferrer">vLLM 分块 Prefill 与性能优化</a>；<a href="https://docs.vllm.ai/en/stable/features/disagg_prefill/" target="_blank" rel="noopener noreferrer">vLLM Prefill/Decode 分离</a>；<a href="https://github.com/vllm-project/vllm/blob/main/docs/features/kv_offloading_usage.md" target="_blank" rel="noopener noreferrer">vLLM KV 卸载</a>。不同版本和后端支持能力不同，课件讲原理，不作为特定版本部署配置。</li><li id="src-k8s"><b>调度：</b><a href="https://kubernetes.io/docs/tasks/manage-gpus/scheduling-gpus/" target="_blank" rel="noopener noreferrer">Kubernetes GPU 调度</a>；<a href="https://kubernetes.io/docs/concepts/scheduling-eviction/taint-and-toleration/" target="_blank" rel="noopener noreferrer">污点与容忍</a>；<a href="https://kubernetes.io/docs/concepts/scheduling-eviction/pod-priority-preemption/" target="_blank" rel="noopener noreferrer">优先级与抢占</a>。成组调度还需相应的调度或队列能力。</li></ol>
+<div class="note"><b>手算复核表</b><br>✓ GQA：128 KiB/token，4096 长度 512 MiB。<br>✓ MHA 对比：512 KiB/token，4096 长度 2 GiB。<br>✓ MQA 对比：16 KiB/token，4096 长度 64 MiB。<br>✓ 500B 本练习假设：384 KiB/token。<br>✓ 16 张 H100：1280×0.90−1000=152 GB。课堂近似 8k≈50、32k≈12；严格十进制预算为 47、11。<br>✓ 所有速度均区分读取下限、速度上界和实测结果。</div></section><footer>从一个数字算起，每一步都知道自己假设了什么。<br>单文件互动学习资料 · 中文讲解 · 不依赖网络运行</footer></main></div><a class="back" href="#top">↑ 回到顶部</a>
+<script>
+'use strict';
+const $=id=>document.getElementById(id);
+const fmt=(x,d=4)=>Number(x).toLocaleString('zh-CN',{maximumFractionDigits:d});
+function sizeText(bytes){if(bytes<1024)return fmt(bytes,6)+' B';if(bytes<1048576)return fmt(bytes/1024)+' KiB / '+fmt(bytes/1000)+' KB';if(bytes<1073741824)return fmt(bytes/1048576)+' MiB / '+fmt(bytes/1e6)+' MB';return fmt(bytes/1073741824)+' GiB / '+fmt(bytes/1e9)+' GB';}
+function requireNum(id,{integer=false,min=0,max=Infinity,positive=false}={}){const raw=$(id).value.trim(),v=Number(raw);if(!raw||!Number.isFinite(v)||(integer&&!Number.isSafeInteger(v))||v<min||v>max||(positive&&v<=0))throw Error('请填写有效数值：维度、长度和 batch 为正整数；容量非负；可用比例在 0～1；带宽必须大于 0。');return v;}
+function softmaxMath(z){const m=Math.max(...z),exps=z.map(v=>Math.exp(v-m)),sum=exps.reduce((a,b)=>a+b,0);return {p:exps.map(v=>v/sum),exps,sum,m,lse:m+Math.log(sum)};}
+function parseLogits(){const raw=$('logits').value.trim();if(!raw)throw Error('请先输入至少一个有限打分。');const parts=raw.split(/[\s,，;；]+/).filter(Boolean);if(parts.length>100)throw Error('最多输入 100 个打分，便于逐项阅读。');const z=parts.map(Number);if(!z.length||z.some(v=>!Number.isFinite(v)))throw Error('打分必须是有限数字，例如 0, 1.1, -2。');return z;}
+function updateSoft(){try{const z=parseLogits(),r=softmaxMath(z);$('softError').textContent='';$('softBars').replaceChildren();r.p.forEach((p,i)=>{const row=document.createElement('div');row.className='barrow';const name=document.createElement('span');name.textContent='候选 '+(i+1);const track=document.createElement('div');track.className='track';const fill=document.createElement('div');fill.className='fill';fill.style.width=(100*p)+'%';track.append(fill);const val=document.createElement('span');val.textContent=fmt(100*p,4)+'%';row.append(name,track,val);$('softBars').append(row);});$('softWork').textContent='① 最大打分 m='+fmt(r.m,6)+'。\n② exp(z−m)=['+r.exps.map(x=>fmt(x,6)).join(', ')+']。\n③ 指数和='+fmt(r.sum,6)+'。\n④ 各项除以和 → 概率=['+r.p.map(x=>fmt(x,6)).join(', ')+']；总和='+fmt(r.p.reduce((a,b)=>a+b,0),8)+'。\n⑤ LSE=m+ln(指数和)='+fmt(r.lse,6)+'。';}catch(e){$('softError').textContent=e.message;$('softBars').replaceChildren();$('softWork').textContent='修正输入后将实时重算。';}}
+$('logits').addEventListener('input',updateSoft);$('shiftLogits').onclick=()=>{try{$('logits').value=parseLogits().map(v=>v+10).join(', ');updateSoft();}catch(e){$('softError').textContent=e.message;}};$('resetLogits').onclick=()=>{$('logits').value='0, 1.0986122886681098';updateSoft();};
+const presets={toy:[2,1,2,2,5,1,.000004,.9,.000002,0],gqa:[32,8,128,2,4096,1,80,.9,16,0],mha:[32,32,128,2,4096,1,80,.9,16,0],mqa:[32,1,128,2,4096,1,80,.9,16,0],'70b':[80,8,128,2,4096,1,640,.9,140,0],'500bf':[96,8,128,2,8192,1,1280,.9,1000,0],'500fp':[96,8,128,2,8192,1,1280,.9,500,0]};
+const kvIds=['kvLayers','kvHeads','kvDim','kvBytes','kvSeq','kvBatch','kvGpu','kvUtil','kvWeight','kvReserve'];
+function kvMath({layers,heads,dim,bytes,seq,batch,gpu,util,weight,reserve}){const layerElements=2*heads*dim,tokenElements=layerElements*layers,requestElements=tokenElements*seq,batchElements=requestElements*batch;return {layerElements,tokenElements,requestElements,batchElements,layerToken:layerElements*bytes,token:tokenElements*bytes,request:requestElements*bytes,total:batchElements*bytes,pool:(gpu*util-weight-reserve)*1e9};}
+let latestKv=null;
+function readKv(){return {layers:requireNum('kvLayers',{integer:true,positive:true}),heads:requireNum('kvHeads',{integer:true,positive:true}),dim:requireNum('kvDim',{integer:true,positive:true}),bytes:requireNum('kvBytes',{positive:true}),seq:requireNum('kvSeq',{integer:true,positive:true}),batch:requireNum('kvBatch',{integer:true,positive:true}),gpu:requireNum('kvGpu'),util:requireNum('kvUtil',{max:1}),weight:requireNum('kvWeight'),reserve:requireNum('kvReserve')};}
+function stat(label,value,detail=''){const el=document.createElement('div');el.className='stat';const l=document.createElement('span');l.textContent=label;const b=document.createElement('b');b.textContent=value;el.append(l,b);if(detail){const s=document.createElement('span');s.textContent=detail;el.append(s);}return el;}
+function updateKv(){try{const v=readKv(),r=kvMath(v);if(!Object.values(r).every(Number.isFinite)||r.batchElements>Number.MAX_SAFE_INTEGER||r.total>Number.MAX_SAFE_INTEGER||r.pool>Number.MAX_SAFE_INTEGER)throw Error('数值过大，已超出本计算器的精确整数范围，请降低规模。');const cap=Math.floor(Math.max(0,r.pool)/r.request);if(!Number.isSafeInteger(cap))throw Error('并发结果超出精确整数范围，请降低显存容量。');$('kvError').textContent=r.pool<0?'权重与预留已超过可用显存：此副本装不下，KV 可分配池为 0。':'';$('kvResults').replaceChildren(stat('每层每词元 KV（K+V）',sizeText(r.layerToken),fmt(r.layerToken,6)+' B'),stat('每词元 KV · 全部层',sizeText(r.token),fmt(r.token,6)+' B'),stat('每请求 KV',sizeText(r.request),fmt(r.request)+' B'),stat('整个 batch 的 KV',sizeText(r.total),fmt(r.total)+' B'),stat('扣权重与运行预留后的 KV 池',sizeText(Math.max(0,r.pool)),r.pool<0?'显存不足':fmt(r.pool)+' B'),stat('等长请求容量上限',fmt(cap)+' 个',r.pool>=r.total?'当前 batch 在简化池内可容纳':'当前 batch 超过简化 KV 池'));
+$('kvWork').textContent='① 单层单词元元素：2×'+v.heads+'×'+v.dim+'='+fmt(r.layerElements)+'。\n② 全层单词元元素：'+fmt(r.layerElements)+'×'+v.layers+'='+fmt(r.tokenElements)+'。\n③ 单请求元素：'+fmt(r.tokenElements)+'×'+v.seq+'='+fmt(r.requestElements)+'。\n④ 整批元素：'+fmt(r.requestElements)+'×'+v.batch+'='+fmt(r.batchElements)+'。\n⑤ 整批字节：'+fmt(r.batchElements)+'×'+v.bytes+'='+fmt(r.total)+' B。\n⑥ KV 池=('+v.gpu+'×'+v.util+'−'+v.weight+'−'+v.reserve+')×10⁹='+fmt(r.pool)+' B。\n⑦ 并发上限=向下取整(max(0,池)÷单请求字节)='+fmt(cap)+'。\n容量上界未计分页尾部、KV 复制、卡间不均衡与额外输出增长；SLO 上限可能更低。';latestKv={v,r};$('sendDecode').disabled=false;}catch(e){$('kvError').textContent=e.message;$('kvResults').replaceChildren();$('kvWork').textContent='修正输入后将实时重算。';latestKv=null;$('sendDecode').disabled=true;}}
+function applyPreset(){const k=$('kvPreset').value;presets[k].forEach((v,i)=>$(kvIds[i]).value=v);$('presetNote').textContent=k.startsWith('500')?'本练习假设：500B 总参数稠密模型；96 层、8 KV 头、128 维；KV 始终 bf16。16×H100，理想均匀分配，额外预留暂为 0。':k==='toy'?'纯教学微型容量：4000 B 总存储、2000 B 权重，不代表真实 GPU。':(k==='mha'||k==='mqa')?'仅为同形状 KV 存储对比，不是 Llama 3 8B 官方架构切换选项。权重使用 8B×2 B 的课堂近似。':k==='70b'?'Llama 3 70B：80 层、64 Q 头、8 KV 头、每头 128 维。权重使用 70B×2 B 的课堂近似；GPU 总量作容量示例。':'Llama 3 8B：32 层、32 Q 头、8 KV 头、每头 128 维。权重使用 8B×2 B 的课堂近似。';updateKv();}
+$('kvPreset').addEventListener('change',applyPreset);kvIds.forEach(id=>$(id).addEventListener('input',updateKv));
+function decodeMath(weight,kv,bw,batch){const seconds=(weight+kv)/(bw*1000);return {seconds,ms:seconds*1000,stream:1/seconds,total:batch/seconds};}
+function updateDecode(){try{const w=requireNum('decWeight'),k=requireNum('decKv'),bw=requireNum('decBw',{positive:true}),b=requireNum('decBatch',{integer:true,positive:true});if(w+k<=0)throw Error('读取量不能同时为 0；零读取模型无法推导有意义的速度上界。');const r=decodeMath(w,k,bw,b);if(!Object.values(r).every(x=>Number.isFinite(x)&&x>0))throw Error('数值超出计算范围，请使用合理规模。');$('decError').textContent='';$('decResults').replaceChildren(stat('每步读取时间下限',fmt(r.ms,4)+' ms','理想模型，不含通信、计算等开销'),stat('单流速度上界',fmt(r.stream,3)+' token/s'),stat('整个 batch 总吞吐上界',fmt(r.total,3)+' token/s'),stat('每步读取总量',fmt(w+k,6)+' GB','权重一次 + 整批 KV'));
+$('decWork').textContent='① 读取量='+fmt(w,6)+'+'+fmt(k,6)+'='+fmt(w+k,6)+' GB。\n② 聚合有效带宽='+fmt(bw,6)+'×1000='+fmt(bw*1000,6)+' GB/s。\n③ t≥'+fmt(w+k,6)+'÷'+fmt(bw*1000,6)+'='+fmt(r.seconds,8)+' s='+fmt(r.ms,4)+' ms。\n④ 单流≤1/t='+fmt(r.stream,3)+' token/s；总吞吐≤'+b+'/t='+fmt(r.total,3)+' token/s。';}catch(e){$('decError').textContent=e.message;$('decResults').replaceChildren();$('decWork').textContent='修正输入后将实时重算。';}}
+['decWeight','decKv','decBw','decBatch'].forEach(id=>$(id).addEventListener('input',updateDecode));function setDecode(w,k,bw,b){['decWeight','decKv','decBw','decBatch'].forEach((id,i)=>$(id).value=[w,k,bw,b][i]);updateDecode();}
+$('decToy').onclick=()=>setDecode(6,2,.1,4);$('dec8b').onclick=()=>setDecode(16,4.294967296,3.35,8);$('dec500').onclick=()=>setDecode(1000,3.221225472*8,16*3.35,8);$('sendDecode').onclick=()=>{if(!latestKv)return;setDecode(latestKv.v.weight,latestKv.r.total/1e9,$('decBw').value,latestKv.v.batch);$('c8').scrollIntoView();};
+const quiz=[
+['X 与 xᵢ 有何区别？多个词元时呢？','X 是单个词元的整行隐藏向量，xᵢ 是其中一个分量。多个词元把整行堆成 T×hidden_size 的矩阵；投影逐行独立。'],
+['32 层与 32 个头分别是什么？','层（Layer）是纵向堆叠且权重独立的块；头（head）是同一层中的多路注意力。残差相加要求输入输出形状相同。'],
+['4096 隐藏维度、32 Q 头、8 KV 头，各得出什么？','head_dim=4096÷32=128；4 个 Q 头共用一份 KV；KV 总宽度=8×128=1024，不是 4096。'],
+['Q、K、V 怎样算，谁做 RoPE？','分别为 XWq、XWk、XWv；Q、K 做 RoPE，V 不做。Q 匹配 K，权重汇总 V，多头拼接再过 Wo。'],
+['softmax 与 z-loss 的区别是什么？','softmax 把打分变概率，共同加常数不改变概率；z-loss 是训练时额外加 α×logsumexp²，约束整体漂移，并非所有模型都用。'],
+['为什么只缓存 K、V？Prefill 与 Decode 做什么？','旧 Q 不服务后续查询。因果前缀固定使旧 K、V 不变；Prefill 处理提示位置填缓存，Decode 每次算新位置并追加。'],
+['从元素数推导 8B 的 128 KiB/token 和 512 MiB/4096。','单层：2×8×128=2048 元素；32 层=65,536 元素；bf16×2=131,072 B=128 KiB；再×4096=512 MiB。'],
+['500B 本练习权重、KV、并发与并行怎么说？','bf16 1000 GB，fp8 500 GB；96 层假设 KV=384 KiB/token。152 GB 池课堂约 50/12 并发，严格为 47/11。节点内 TP8、跨节点 PP2；加副本扩吞吐。'],
+['TTFT 慢和 TPOT 慢如何分别查？三类负载怎么分池？','TTFT 拆排队与 Prefill，TPOT 看带宽和通信；再看 KV、命中、抢占、SM、MFU 与 PP 气泡。推理保障池，训练可恢复借共享池，RL 分阶段。'],
+['为什么 128k 热 KV 不宜每步从 DRAM 全量搬？','8B 形状外推为 16 GiB；HBM 理想约 5.13ms，64 GB/s PCIe 约 268ms。冷会话一次恢复可以分摊，热流每步搬会破坏延迟。']
+];quiz.forEach(([q,a],i)=>{const wrap=document.createElement('div'),p=document.createElement('p');p.textContent=(i+1)+'. '+q;const det=document.createElement('details'),sum=document.createElement('summary'),ans=document.createElement('div');sum.textContent='查看速答 '+(i+1);ans.textContent=a;det.append(sum,ans);const lab=document.createElement('label'),check=document.createElement('input');check.type='checkbox';check.className='mastered';check.setAttribute('aria-label','已掌握第 '+(i+1)+' 题');lab.append(check,document.createTextNode('这题我能独立讲清'));wrap.append(p,det,lab);$('quizList').append(wrap);});function score(){$('quizScore').textContent='已掌握 '+document.querySelectorAll('.mastered:checked').length+' / 10 项';}document.querySelectorAll('.mastered').forEach(c=>c.onchange=score);$('quizReset').onclick=()=>{document.querySelectorAll('.mastered').forEach(c=>c.checked=false);score();};
+let deadline=0,remaining=300000,timerRunning=false;function showTimer(){const sec=Math.max(0,Math.ceil(remaining/1000));$('timerText').textContent=String(Math.floor(sec/60)).padStart(2,'0')+':'+String(sec%60).padStart(2,'0');}setInterval(()=>{if(timerRunning){remaining=Math.max(0,deadline-Date.now());if(!remaining)timerRunning=false;showTimer();}},250);$('timerStart').onclick=()=>{remaining=300000;deadline=Date.now()+remaining;timerRunning=true;showTimer();};$('timerPause').onclick=()=>{if(timerRunning){remaining=Math.max(0,deadline-Date.now());timerRunning=false;}else if(remaining>0){deadline=Date.now()+remaining;timerRunning=true;}showTimer();};
+const glossaryRaw=`人工智能基础设施|AI Infrastructure / AI Infra|让模型可训练、可运行、可稳定服务的计算与软件系统
+大语言模型|Large Language Model / LLM|根据已有内容预测后续文字的模型
+训练|training|用样本与目标调整模型参数
+推理|inference|运行训练完成的模型获得输出
+词元|Token|分词器给模型使用的基本文字片段
+分词器|tokenizer|把文字转换为词元编号的程序
+词元编号|token ID|词表中某个片段的整数索引
+向量|vector|一串有顺序的数字
+分量|component|向量里的单个数字
+维度|dimension|向量包含的数字数量
+词嵌入|embedding|按词元编号查表得到的初始向量
+隐藏向量|hidden vector / hidden state|模型内部对一个位置的数字表示
+隐藏维度|hidden size|一个隐藏向量的宽度
+矩阵|matrix|按行和列排好的数字表
+形状|shape|矩阵或数据各轴的大小
+上下文|context|解释当前位置时可参考的可见文字
+代词指代|pronoun reference|代词在句中所指向的人或事物
+输入表示 X|input hidden representation|一词元为整行向量，多词元为按行堆叠的矩阵
+投影|projection|用权重矩阵对输入进行乘加映射
+平方根|square root|平方后等于原数的非负数
+点积|dot product|对应分量相乘再求和
+矩阵乘法|matrix multiplication|按行列配对完成点积的运算
+权重|weight|训练得到且参与计算的数字
+层|Layer|模型纵向堆叠的处理单元
+变换器块|Transformer block|具有独立权重的注意力等处理组合
+残差连接|residual connection|把输入与处理结果逐分量相加
+注意力|attention|按相关程度从可见位置收集信息的计算
+注意力头|attention head|一路独立的注意力计算
+Q 头|Query head|提供查询向量的注意力路线
+KV 头|Key-Value head|提供用于匹配与读取的键值路线
+每头维度|head_dim|单个头的向量宽度
+多头注意力|Multi-Head Attention / MHA|每个查询头拥有自己的一组键值头
+分组查询注意力|Grouped-Query Attention / GQA|多个查询头分组共用键值头
+多查询注意力|Multi-Query Attention / MQA|所有查询头共用一组键值头
+加权和|weighted sum|各项分别乘系数后相加
+注意力权重|attention weights|当前查询与各可见位置匹配生成的汇总系数
+查询|Query / Q|当前位置用于检索信息的向量
+键|Key / K|被检索位置用于匹配的向量
+值|Value / V|按注意力权重实际汇总的内容向量
+查询投影权重|Query projection weights / Wq|把 X 映射成 Q 的矩阵
+键投影权重|Key projection weights / Wk|把 X 映射成 K 的矩阵
+值投影权重|Value projection weights / Wv|把 X 映射成 V 的矩阵
+冻结|frozen|推理过程中不更新模型权重
+旋转位置编码|Rotary Position Embedding / RoPE|通过旋转 Q、K 分量引入位置信息
+输出投影|output projection / Wo|把多头拼接结果映射回隐藏宽度
+因果遮罩|causal mask|限制当前位置不能读取未来位置
+概率|probability|0 到 1 之间表示某一结果可能性的数
+概率分布|probability distribution|所有候选结果的概率，总和为 1
+归一化|normalization|在本课中指按总和把数值缩放到和为 1
+未归一化打分|logits|尚未转换为概率的一组实数
+软最大函数|softmax|指数化再除以总和，得到概率分布
+指数函数|exponential function / exp|以 e 为底的幂函数
+自然对数|natural logarithm / ln|以 e 为底的对数，是 exp 的逆函数
+词表|vocabulary|模型可识别或输出的词元编号集合
+词表输出投影|vocabulary output projection|把最终隐藏表示变成词表打分
+损失|loss|衡量预测目标偏差的训练标量
+交叉熵损失|cross-entropy loss|单一正确答案时为负的正确答案对数概率
+采样|sampling|按概率分布随机抽取输出
+对数指数和|logsumexp / LSE|指数求和后取自然对数
+z 损失|z-loss|系数乘 LSE 平方的训练约束
+系数|coefficient|控制某一项贡献大小的乘数
+正则项|regularization term|训练目标中附加的约束项
+数值稳定性|numerical stability|避免浮点溢出和过大舍入误差
+键值缓存|Key-Value Cache / KV Cache|保存每层历史位置的 K、V 供复用
+自回归生成|autoregressive generation|逐个追加输出再继续预测
+提示词|prompt|请求给定的已有输入内容
+预填充|Prefill|处理提示位置并建立 KV 的阶段
+逐步解码|Decode|逐步处理新位置并预测后续输出
+请求|request|一次模型服务调用
+前向计算|forward pass|把输入运行通过模型得到结果
+字节|byte / B|8 个比特组成的存储单位
+比特|bit|取值为 0 或 1 的信息单位
+每元素字节数|bytes per element|保存一个数所占的字节
+脑浮点 16|Brain Floating Point 16 / bf16|每个数占 16 比特，即 2 字节的格式
+八位浮点|8-bit floating point / fp8|每个数占 8 比特，即 1 字节的格式
+序列长度|sequence length|当前保留的词元数量
+批次|batch|一起执行的请求集合
+批量大小|batch size|一个批次包含的请求数
+图形处理器|Graphics Processing Unit / GPU|擅长并行数值计算的处理器
+显存|GPU memory|GPU 用于放权重与运行数据的存储
+缓存池|KV pool|为键值缓存保留的显存预算
+并发|concurrency|同时存在或运行的请求数，需区分口径
+十进制容量单位|KB / MB / GB / TB|分别为 10³、10⁶、10⁹、10¹² 字节
+二进制容量单位|KiB / MiB / GiB|分别为 2¹⁰、2²⁰、2³⁰ 字节
+向下取整|floor|取不大于原数的最大整数
+分片|sharding|把数据拆分放到不同设备
+复制|replication|在多个位置保留同一份数据
+低精度缓存|low-precision KV cache|用较少比特保存缓存数值
+量化权重|quantized weights|用较少比特表示权重，需要质量验证
+首词元延迟|Time To First Token / TTFT|请求开始到收到首个输出词元的延迟
+每输出词元延迟|Time Per Output Token / TPOT|首个输出之后的平均输出间隔
+吞吐|throughput|单位时间完成的工作量
+带宽|bandwidth|单位时间能搬运的字节数
+聚合带宽|aggregate bandwidth|多个同时工作设备的带宽总和
+有效带宽|effective bandwidth|应用数据路径实际可达到的搬运速率
+算力密集|compute-bound|主要受计算速度约束
+访存密集|memory-bound|主要受数据搬运速度约束
+高带宽内存|High Bandwidth Memory / HBM|GPU 上的高带宽显存
+浮点运算|Floating Point Operation / FLOP|一次浮点算术操作
+万亿次浮点每秒|TFLOPS|每秒 10¹² 次浮点操作的速率
+稠密计算|dense computation|不依赖跳过零元素的计算
+稀疏|sparse|大量零值或选择性计算的结构
+节点|node|集群中的一台服务器
+节点内互联|NVLink|GPU 之间的高速连接技术
+参数|parameter|模型内可学习的数字
+十亿参数|billion parameters / B|模型规模中 B 表示 10⁹ 个参数
+稠密模型|Dense model|每个词元使用主要完整权重路径的模型
+混合专家模型|Mixture of Experts / MoE|按输入路由到部分专家子网络的模型
+专家|expert|混合专家层中的一个子网络
+路由器|router|为词元选择专家的计算模块
+总参数|total parameters|模型所有参数的总量
+激活参数|active parameters|单个词元计算路径实际使用的参数量
+智能体|agent|可调用工具并继续推理的程序
+系统提示词|system prompt|请求开头规定角色与行为的文本
+工具调用|tool call|模型请求外部工具并接回结果的过程
+分位数|percentile / p50 / p95|排序后一定比例样本不超过的数值
+最大值|maximum / max|样本或配置允许的最高数值
+服务等级目标|Service Level Objective / SLO|服务延迟、可靠性等方面的性能目标
+副本|replica|一套可以独立服务的完整模型部署
+每秒请求数|Queries Per Second / QPS|每秒进入或完成的请求数，须说明口径
+准入控制|admission control|按预算决定请求是否进入运行
+输入输出比|input/output ratio|输入与输出词元数的比例
+互联拓扑|interconnect topology|设备间连接路径与结构
+张量并行|Tensor Parallelism / TP|同一层权重计算拆到多张设备
+集合通信|collective communication|多设备交换或汇总数据的通信
+流水线并行|Pipeline Parallelism / PP|不同层放到不同阶段依次计算
+数据并行|Data Parallelism / DP|推理中由完整副本分别处理不同请求
+专家并行|Expert Parallelism / EP|把不同专家部署到不同设备
+全到全通信|all-to-all|每个参与者向多个其他参与者分别发送数据
+微批次|microbatch|用于流水线交错执行的小批次
+流水线气泡|pipeline bubble|流水线部分阶段因等待而空闲的时间
+最大运行序列数|max_num_seqs|服务引擎允许同时运行的序列数量上限
+分页注意力|PagedAttention|用物理不连续的 KV 块支持逻辑连续注意力
+前缀缓存|prefix caching|复用完全一致开头的已计算键值数据
+引用计数|reference counting|记录仍在使用共享块的使用者数量
+分块预填充|Chunked Prefill|把长 Prefill 分块与其他工作穿插执行
+预填充/解码分离|Prefill/Decode disaggregation|用不同服务资源执行两阶段并传递 KV
+集群|cluster|多节点组成的计算资源集合
+负载|workload|需要运行的任务或任务集合
+调度|scheduling|决定任务在哪些资源上、何时运行
+强化学习|Reinforcement Learning / RL|用奖励信号改进模型行为的训练方式
+采样生成|rollout|用当前模型生成回答或交互轨迹
+成组调度|gang scheduling|为分布式任务一次备齐整组资源
+检查点|checkpoint|可用于恢复训练状态的快照
+优化器状态|optimizer state|更新参数所需的额外训练数据
+抢占|preemption|收回或暂停低优先级工作的资源；需明确层级
+容器编排|Kubernetes|管理容器任务与节点资源的系统
+容器|container|封装程序及运行环境的执行形式
+容器组|Pod|Kubernetes 的基本调度单元
+节点池|node pool|按硬件或用途分组的节点集合
+污点|taint|排斥不匹配容器组的节点标记
+容忍|toleration|允许容器组进入带对应污点的节点
+节点选择器|node selector|按节点标签限制调度目标
+节点亲和性|node affinity|表达任务对节点的选择约束或偏好
+设备插件|GPU device plugin|把 GPU 暴露为可申请资源的组件
+资源配额|resource quota|约束命名空间等范围内的资源申请总量
+命名空间|namespace|Kubernetes 的资源管理分组
+优先级|priority|调度中表达任务相对重要程度
+整节点分配|whole-node allocation|把完整节点分配给同一任务或并行组
+碎片|fragmentation|空闲资源分散而无法满足成组需求
+预热副本|warm replica|权重已载入且初始化完成的服务副本
+排空|drain|停止新请求并等待已有工作安全结束
+性能调试|performance debugging|通过测量定位瓶颈并验证优化
+流式多处理器|Streaming Multiprocessor / SM|GPU 中执行并行计算的单元
+SM 利用率|SM utilization|观测区间内 SM 的活跃程度，依计数器定义
+显存带宽利用率|memory bandwidth utilization|实际搬运速率相对参考峰值的比例
+模型算力利用率|Model FLOPs Utilization / MFU|有效模型运算速率相对硬件稠密峰值的比例
+KV 池利用率|KV pool utilization|已占缓存块相对可用缓存块的比例
+前缀命中率|prefix hit rate|请求或词元前缀被复用的比例，需说明分母
+排队时间|queueing time|请求等待准入或执行的时间
+抢占次数|preemption count|指定范围内请求或作业被暂停、换出或重算的次数
+投机解码|speculative decoding|用廉价候选加目标模型验证争取每轮多个输出
+草稿模型|draft model|投机解码中用于提出候选的便宜模型
+目标模型|target model|验证候选并保证最终输出规则的主模型
+缓存卸载|KV Cache Offload|把 KV 从显存移至其他存储并在需要时恢复
+多级缓存|Multi-Tier KV Cache|按热度与速度把缓存放在不同存储层
+热数据|hot data|近期高频访问的数据
+冷数据|cold data|近期较少访问的数据
+中央处理器|Central Processing Unit / CPU|主机的通用处理器
+动态随机存取内存|Dynamic Random-Access Memory / DRAM|主机使用的易失性内存
+高速外设互联|Peripheral Component Interconnect Express / PCIe|连接主机与 GPU 等设备的互联接口
+非易失内存快速接口固态盘|NVMe SSD|经 NVMe 协议访问的固态存储
+远端存储|remote storage|通过网络访问的存储
+预取|prefetch|在计算真正需要前提前搬运数据
+窗口注意力|sliding-window attention|按模型规则只读取局部历史窗口
+全注意力|full attention|访问全部可见历史的注意力
+离线|offline|不要求即时交互响应的处理方式
+非均匀内存访问拓扑|Non-Uniform Memory Access topology / NUMA topology|不同主机内存位置具有不同访问代价的结构`;
+const glossary=glossaryRaw.trim().split('\n').map(s=>s.split('|'));
+function renderGlossary(){const q=$('glossSearch').value.trim().toLowerCase(),rows=glossary.filter(r=>r.join(' ').toLowerCase().includes(q));$('glossRows').replaceChildren();rows.forEach(r=>{const tr=document.createElement('tr');r.forEach(c=>{const td=document.createElement('td');td.textContent=c;tr.append(td);});$('glossRows').append(tr);});$('glossCount').textContent='显示 '+rows.length+' / '+glossary.length+' 个术语';}
+$('glossSearch').addEventListener('input',renderGlossary);
+const sections=[...document.querySelectorAll('[data-title]')];sections.forEach(s=>{const a=document.createElement('a');a.href='#'+s.id;a.textContent=s.dataset.title;$('toc').append(a);});$('navToggle').onclick=()=>{const open=$('sidebar').classList.toggle('expanded');$('navToggle').setAttribute('aria-expanded',String(open));};
+function readingUpdate(){const total=document.documentElement.scrollHeight-innerHeight;$('readProgress').value=total>0?100*scrollY/total:0;let current=sections[0];sections.forEach(s=>{if(s.getBoundingClientRect().top<150)current=s;});document.querySelectorAll('#toc a').forEach(a=>{const active=a.hash==='#'+current.id;a.classList.toggle('active',active);if(active)a.setAttribute('aria-current','location');else a.removeAttribute('aria-current');});}
+window.addEventListener('scroll',readingUpdate,{passive:true});window.addEventListener('resize',readingUpdate);
+window.courseMath={softmax:softmaxMath,kv:kvMath,decode:decodeMath};
+updateSoft();applyPreset();updateDecode();renderGlossary();readingUpdate();
+</script></body></html>
